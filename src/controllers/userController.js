@@ -1,10 +1,17 @@
 const {UserModel} = require('../models')
-const {hashPassword, validatePassword, createToken, verifyToken} = require('../utils')
+const {hashPassword, validatePassword, createToken, verifyToken, errorHandler} = require('../utils')
 const sgMail = require('../sendgrid')
 
 const signUp = async (req, res, next) => {
   try {
     const {email, name, role, password, team} = req.body
+
+    const user = await UserModel.findOne({email})
+
+    if (user) {
+      return errorHandler(next, {code: 409})
+    }
+
     const hashedPassword = await hashPassword(password)
 
     const newUser = new UserModel({email, name, password: hashedPassword, role, team})
@@ -28,7 +35,7 @@ const signUp = async (req, res, next) => {
 
     res.status(201).json({data: newUser, accessToken})
   } catch (err) {
-    next(err)
+    errorHandler(next)
   }
 }
 
@@ -39,17 +46,20 @@ const login = async (req, res, next) => {
     const user = await UserModel.findOne({email})
 
     if (!user) {
-      return res.status(404).json({error: 'Email does not exist'})
+      // return res.status(404).json({error: 'Email does not exist'})
+      return errorHandler(next, {code: 404})
     }
 
     const validPassword = await validatePassword(password, user.password)
 
     if (!validPassword) {
-      return res.status(400).json({error: 'Password is not correct'})
+      // return res.status(404).json({error: 'Password is not correct'})
+      return errorHandler(next, {code: 404})
     }
 
     if (user.role === 'manager' && !user.confirmed) {
-      return res.status(400).json({error: 'You need to be confirmed to access this route'})
+      // return res.status(400).json({error: 'You need to be confirmed to access this route'})
+      return errorHandler(next, {code: 403})
     }
 
     const accessToken = createToken(user._id)
@@ -58,21 +68,17 @@ const login = async (req, res, next) => {
 
     res.status(200).json({data: {email: user.email, role: user.role}, accessToken})
   } catch (err) {
-    next(err)
+    return errorHandler(next)
   }
 }
 
 const getAllUsers = async (req, res, next) => {
-  console.log('here3')
   try {
     const users = await UserModel.find()
 
     res.status(200).json({data: users})
-    console.log('here4')
   } catch (err) {
-    console.log('here5')
-
-    next(err)
+    errorHandler(next)
   }
 }
 
@@ -81,12 +87,14 @@ const getUserById = async (req, res, next) => {
     const user = await UserModel.findById(req.params.id)
 
     if (!user) {
-      return res.status(404).json({error: 'User does not exist'})
+      // return res.status(404).json({error: 'User does not exist'})
+      return errorHandler(next, {code: 404})
     }
 
     res.status(200).json({data: user})
   } catch (err) {
-    next(err)
+    res.status(400)
+    errorHandler(next)
   }
 }
 
@@ -94,9 +102,9 @@ const deleteUserById = async (req, res, next) => {
   try {
     const user = await UserModel.findByIdAndDelete(req.params.id)
 
-    return res.status(200).json({data: user, message: 'User has been deleted'})
+    res.status(200).json({data: user, message: 'User has been deleted'})
   } catch (err) {
-    next(err)
+    errorHandler(next)
   }
 }
 
@@ -107,11 +115,13 @@ const confirmationUserEmail = async (req, res, next) => {
     const user = await UserModel.findById(userId)
 
     if (!user) {
-      return res.status(404).json({error: 'User does not exist'})
+      // return res.status(404).json({error: 'User does not exist'})
+      return errorHandler(next, {code: 404})
     }
 
     if (user.confirmed) {
-      return res.status(400).json({error: 'User already confimed'})
+      // return res.status(400).json({error: 'User already confimed'})
+      return errorHandler(next, {code: 400})
     }
 
     if (user.role === 'manager') {
@@ -120,7 +130,7 @@ const confirmationUserEmail = async (req, res, next) => {
 
     res.status(200).json({data: user, message: 'This manager was confirmed'})
   } catch (err) {
-    next(err)
+    errorHandler(next)
   }
 }
 

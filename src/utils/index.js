@@ -1,18 +1,17 @@
-const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
-
-const hashPassword = async (password) => bcrypt.hash(password, 10)
-
-const validatePassword = async (plainPassword, hashedPassword) =>
-  bcrypt.compare(plainPassword, hashedPassword)
-
-const createToken = (userId) => jwt.sign({userId}, process.env.JWT_SECRET, {expiresIn: '1d'})
-
-const verifyToken = (accessToken) => jwt.verify(accessToken, process.env.JWT_SECRET)
+const {
+  validatePassword,
+  hashPassword,
+  createToken,
+  verifyToken,
+  parseRoutesPath
+} = require('./common')
+const errorHandler = require('./errorHandler')
 
 module.exports = {
-  hashPassword,
   validatePassword,
+  hashPassword,
   createToken,
-  verifyToken
+  verifyToken,
+  parseRoutesPath,
+  errorHandler
 }

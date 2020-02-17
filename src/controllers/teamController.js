@@ -1,6 +1,6 @@
 const {TeamModel, UserModel} = require('../models')
 const sgMail = require('../sendgrid')
-const {verifyToken} = require('../utils')
+const {verifyToken, errorHandler} = require('../utils')
 
 const createTeam = async (req, res, next) => {
   try {
@@ -12,7 +12,7 @@ const createTeam = async (req, res, next) => {
 
     res.status(201).json({data: newTeam})
   } catch (err) {
-    next(err)
+    errorHandler(next)
   }
 }
 
@@ -22,7 +22,7 @@ const getAllTeams = async (req, res, next) => {
 
     res.status(200).json({data: teams})
   } catch (err) {
-    next(err)
+    errorHandler(next)
   }
 }
 
@@ -32,7 +32,7 @@ const getTeamById = async (req, res, next) => {
 
     res.status(200).json({data: team})
   } catch (err) {
-    next(err)
+    errorHandler(next)
   }
 }
 
@@ -42,24 +42,27 @@ const addManagerToTeam = async (req, res, next) => {
     const {title} = req.body
 
     if (user.role !== 'manager') {
-      return res.status(400).json({error: 'This type of user cannot be added to team like manager'})
+      // return res.status(400).json({error: 'This type of user cannot be added to team like manager'})
+      return errorHandler(next, {code: 400})
     }
 
     const team = await TeamModel.findOne({title})
 
     if (!team) {
-      return res.status(404).json({error: 'Team does not exist'})
+      // return res.status(404).json({error: 'Team does not exist'})
+      return errorHandler(next, {code: 404})
     }
 
     if (team.managerId) {
-      return res.status(404).json({error: 'Team already have manager'})
+      // return res.status(409).json({error: 'Team already have manager'})
+      return errorHandler(next, {code: 409})
     }
 
     const updatedTeam = await TeamModel.findOneAndUpdate({_id: team._id}, {managerId: user})
 
     res.status(200).json({data: updatedTeam, message: 'Manager was added to the team'})
   } catch (err) {
-    next(err)
+    errorHandler(next)
   }
 }
 
@@ -69,27 +72,32 @@ const requestToTeam = async (req, res, next) => {
     const {_id, email, role, accessToken} = res.locals.loggedInUser
 
     if (role !== 'player') {
-      return res.status(400).json({error: 'This type of user cannot be added to the team'})
+      // return res.status(400).json({error: 'This type of user cannot be added to the team'})
+      return errorHandler(next, {code: 400})
     }
 
     const team = await TeamModel.findOne({title})
 
     if (!team) {
-      return res.status(404).json({error: 'Team does not exist'})
+      return errorHandler(next, {code: 404})
+      // return res.status(404).json({error: 'Team does not exist'})
     }
 
     if (team.playersId.includes(_id)) {
-      return res.status(400).json({error: 'User already in the team'})
+      // return res.status(409).json({error: 'User already in the team'})
+      return errorHandler(next, {code: 409})
     }
 
     if (team.playersCount === 10) {
-      return res.status(400).json({error: 'Team has been already full'})
+      // return res.status(400).json({error: 'Team has been already full'})
+      return errorHandler(next, {code: 409})
     }
 
     const manager = await UserModel.findById(team.managerId)
 
     if (!manager) {
-      return res.status(400).json({error: 'Team does not have manager. Try again later'})
+      // return res.status(400).json({error: 'Team does not have manager. Try again later'})
+      return errorHandler(next, {code: 404})
     }
 
     const link = `${process.env.SERVER}/team/approveUserToTeam?token=${accessToken}&title=${team.title}&role=${role}`
@@ -104,7 +112,7 @@ const requestToTeam = async (req, res, next) => {
 
     res.status(200).json({data: null, message: 'Your request was sended'})
   } catch (err) {
-    next(err)
+    errorHandler(next)
   }
 }
 
@@ -117,25 +125,30 @@ const approveUserToTeam = async (req, res, next) => {
     const user = await UserModel.findById(userId)
 
     if (!user) {
-      return res.status(404).json({error: 'User does not exist'})
+      // return res.status(404).json({error: 'User does not exist'})
+      return errorHandler(next, {code: 404})
     }
 
     if (role !== 'player') {
-      return res.status(400).json({error: 'This type of user cannot be added to the team'})
+      // return res.status(400).json({error: 'This type of user cannot be added to the team'})
+      return errorHandler(next, {code: 400})
     }
 
     const team = await TeamModel.findOne({title})
 
     if (!team) {
-      return res.status(404).json({error: 'Team does not exist'})
+      // return res.status(404).json({error: 'Team does not exist'})
+      return errorHandler(next, {code: 404})
     }
 
     if (team.playersId.includes(user._id)) {
-      return res.status(400).json({error: 'User already in the team'})
+      // return res.status(409).json({error: 'User already in the team'})
+      return errorHandler(next, {code: 409})
     }
 
     if (team.playersCount === 10) {
-      return res.status(400).json({error: 'Team has been already full'})
+      // return res.status(409).json({error: 'Team has been already full'})
+      return errorHandler(next, {code: 409})
     }
 
     team.playersId.push(user._id)
@@ -154,7 +167,7 @@ const approveUserToTeam = async (req, res, next) => {
 
     return res.status(200).json({data: {team, user}, message: 'User successfully approved'})
   } catch (err) {
-    next(err)
+    errorHandler(next)
   }
 }
 
@@ -164,7 +177,7 @@ const deleteTeamById = async (req, res, next) => {
 
     return res.status(200).json({data: team, message: 'Team has been deleted'})
   } catch (err) {
-    next(err)
+    errorHandler(next)
   }
 }
 

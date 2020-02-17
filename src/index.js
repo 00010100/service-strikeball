@@ -6,7 +6,7 @@ const cors = require('cors')
 
 require('dotenv').config()
 
-const {auth, errorHandler} = require('./middlewares')
+const {auth, notFoundRoutePath, closingErrorHandler} = require('./middlewares')
 const routes = require('./routes/route.js')
 
 const app = express()
@@ -24,8 +24,8 @@ app.use(express.json())
 app.use(auth.isUserAuthorized)
 
 app.use('/api/v1', routes)
-app.use(errorHandler.notFound)
-app.use(errorHandler.errorHandler)
+app.use((req, res, next) => notFoundRoutePath(req, res, next, routes))
+app.use(closingErrorHandler)
 
 const port = process.env.PORT || 5000
 
