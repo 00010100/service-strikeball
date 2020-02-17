@@ -114,7 +114,7 @@ const confirmationUserEmail = async (req, res, next) => {
       await UserModel.findOneAndUpdate({_id: userId}, {confirmed: true})
     }
 
-    res.status(200).json({data: user, message: `This manager was confirmed`})
+    res.status(200).json({data: user, message: 'This manager was confirmed'})
   } catch (err) {
     next(err)
   }

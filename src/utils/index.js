@@ -1,9 +1,10 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
-const hashPassword = async (password) => await bcrypt.hash(password, 10)
+const hashPassword = async (password) => bcrypt.hash(password, 10)
 
-const validatePassword = async (plainPassword, hashedPassword) => await bcrypt.compare(plainPassword, hashedPassword)
+const validatePassword = async (plainPassword, hashedPassword) =>
+  bcrypt.compare(plainPassword, hashedPassword)
 
 const createToken = (userId) => jwt.sign({userId}, process.env.JWT_SECRET, {expiresIn: '1d'})
 
