@@ -2,7 +2,7 @@ const {UserModel} = require('../models')
 const {hashPassword, validatePassword, createToken, verifyToken} = require('../utils')
 const sgMail = require('../sendgrid')
 
-signUp = async (req, res, next) => {
+const signUp = async (req, res, next) => {
   try {
     const {email, name, role, password, team} = req.body
     const hashedPassword = await hashPassword(password)
@@ -32,7 +32,7 @@ signUp = async (req, res, next) => {
   }
 }
 
-login = async (req, res, next) => {
+const login = async (req, res, next) => {
   try {
     const {email, password} = req.body
 
@@ -62,7 +62,7 @@ login = async (req, res, next) => {
   }
 }
 
-getAllUsers = async (req, res, next) => {
+const getAllUsers = async (req, res, next) => {
   try {
     const users = await UserModel.find()
 
@@ -72,7 +72,7 @@ getAllUsers = async (req, res, next) => {
   }
 }
 
-getUserById = async (req, res, next) => {
+const getUserById = async (req, res, next) => {
   try {
     const user = await UserModel.findById(req.params.id)
 
@@ -86,7 +86,7 @@ getUserById = async (req, res, next) => {
   }
 }
 
-deleteUserById = async (req, res, next) => {
+const deleteUserById = async (req, res, next) => {
   try {
     const user = await UserModel.findByIdAndDelete(req.params.id)
 
@@ -96,7 +96,7 @@ deleteUserById = async (req, res, next) => {
   }
 }
 
-confirmationUserEmail = async (req, res, next) => {
+const confirmationUserEmail = async (req, res, next) => {
   try {
     const {userId} = verifyToken(req.params.token)
 

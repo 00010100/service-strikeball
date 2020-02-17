@@ -31,7 +31,7 @@ const allowIfLoggedin = async (req, res, next) => {
   }
 }
 
-const isValidUser = async (req, res, next) => {
+const isUserAuthorized = async (req, res, next) => {
   if (req.headers['x-access-token']) {
     const accessToken = req.headers['x-access-token']
     const {userId, exp} = await verifyToken(accessToken)
@@ -67,5 +67,5 @@ module.exports = {
   errorHandler,
   allowIfLoggedin,
   grantAccess,
-  isValidUser
+  isUserAuthorized
 }

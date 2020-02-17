@@ -2,7 +2,7 @@ const {TeamModel, UserModel} = require('../models')
 const sgMail = require('../sendgrid')
 const {verifyToken} = require('../utils')
 
-createTeam = async (req, res, next) => {
+const createTeam = async (req, res, next) => {
   try {
     const {title} = req.body
 
@@ -16,7 +16,7 @@ createTeam = async (req, res, next) => {
   }
 }
 
-getAllTeams = async (req, res, next) => {
+const getAllTeams = async (req, res, next) => {
   try {
     const teams = await TeamModel.find()
 
@@ -26,7 +26,7 @@ getAllTeams = async (req, res, next) => {
   }
 }
 
-getTeamById = async (req, res, next) => {
+const getTeamById = async (req, res, next) => {
   try {
     const team = await TeamModel.findById(req.params.id)
 
@@ -36,7 +36,7 @@ getTeamById = async (req, res, next) => {
   }
 }
 
-addManagerToTeam = async (req, res, next) => {
+const addManagerToTeam = async (req, res, next) => {
   try {
     const user = res.locals.loggedInUser
     const {title} = req.body
@@ -63,7 +63,7 @@ addManagerToTeam = async (req, res, next) => {
   }
 }
 
-requestToTeam = async (req, res, next) => {
+const requestToTeam = async (req, res, next) => {
   try {
     const {title} = req.body
     const {_id, email, role, accessToken} = res.locals.loggedInUser
@@ -108,7 +108,7 @@ requestToTeam = async (req, res, next) => {
   }
 }
 
-approveUserToTeam = async (req, res, next) => {
+const approveUserToTeam = async (req, res, next) => {
   try {
     const {token, title, role} = req.query
     const {email: managerEmail} = req.user
@@ -158,7 +158,7 @@ approveUserToTeam = async (req, res, next) => {
   }
 }
 
-deleteTeamById = async (req, res, next) => {
+const deleteTeamById = async (req, res, next) => {
   try {
     const team = await TeamModel.findByIdAndDelete(req.params.id)
 
