@@ -6,7 +6,7 @@ const cors = require('cors')
 
 require('dotenv').config()
 
-const middlewares = require('./middlewares')
+const {auth, errorHandler} = require('./middlewares')
 const routes = require('./routes/route.js')
 
 const app = express()
@@ -21,11 +21,11 @@ app.use(helmet())
 app.use(cors())
 app.use(express.json())
 
-app.use(middlewares.isUserAuthorized)
+app.use(auth.isUserAuthorized)
 
 app.use('/api/v1', routes)
-app.use(middlewares.notFound)
-app.use(middlewares.errorHandler)
+app.use(errorHandler.notFound)
+app.use(errorHandler.errorHandler)
 
 const port = process.env.PORT || 5000
 

@@ -2,7 +2,7 @@ const {Router} = require('express')
 
 const router = Router()
 
-const middlewares = require('../middlewares')
+const {auth} = require('../middlewares')
 const {userController, teamController} = require('../controllers')
 
 router.get('/', (req, res) => {
@@ -14,20 +14,20 @@ router.post('/login', userController.login)
 
 router.get(
   '/users',
-  middlewares.allowIfLoggedin,
-  // middlewares.grantAccess('readAny', 'playerProfile'),
+  auth.allowIfLoggedin,
+  // grantAccess('readAny', 'playerProfile'),
   userController.getAllUsers
 )
-router.get('/user/:id', middlewares.allowIfLoggedin, userController.getUserById)
+router.get('/user/:id', auth.allowIfLoggedin, userController.getUserById)
 router.delete('/user/:id', userController.deleteUserById)
 router.get('/confirmation/:token', userController.confirmationUserEmail)
 
-router.get('/teams', middlewares.allowIfLoggedin, teamController.getAllTeams)
+router.get('/teams', auth.allowIfLoggedin, teamController.getAllTeams)
 router.post('/team', teamController.createTeam)
-router.post('/team/requestToTeam', middlewares.allowIfLoggedin, teamController.requestToTeam)
-router.get('/team/approveUserToTeam', middlewares.allowIfLoggedin, teamController.approveUserToTeam)
-router.post('/team/addManagerToTeam', middlewares.allowIfLoggedin, teamController.addManagerToTeam)
-router.get('/team/:id', middlewares.allowIfLoggedin, teamController.getTeamById)
+router.post('/team/requestToTeam', auth.allowIfLoggedin, teamController.requestToTeam)
+router.get('/team/approveUserToTeam', auth.allowIfLoggedin, teamController.approveUserToTeam)
+router.post('/team/addManagerToTeam', auth.allowIfLoggedin, teamController.addManagerToTeam)
+router.get('/team/:id', auth.allowIfLoggedin, teamController.getTeamById)
 router.delete('/team/:id', teamController.deleteTeamById)
 
 module.exports = router
