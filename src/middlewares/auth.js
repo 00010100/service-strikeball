@@ -20,39 +20,22 @@ const grantAccess = (action, resource) => {
   }
 }
 
-const allowIfLoggedin = async (req, res, next) => {
-  try {
-    const user = res.locals.loggedInUser
-
-    if (!user) return res.status(401).json({error: 'You need to be logged in to access this route'})
-
-    req.user = user
-    next()
-  } catch (error) {
-    next(error)
-  }
-}
-
 const isUserAuthorized = async (req, res, next) => {
-  if (req.headers['x-access-token']) {
-    const accessToken = req.headers['x-access-token']
-    const {userId, exp} = await verifyToken(accessToken)
+  if (!req.headers['x-access-token']) return next()
 
-    if (exp < Date.now().valueOf() / 1000) {
-      return res
-        .status(401)
-        .json({error: 'JWT token has expired, please login to obtain a new one'})
-    }
+  const accessToken = req.headers['x-access-token']
+  const {userId, exp} = verifyToken(accessToken)
 
-    res.locals.loggedInUser = await UserModel.findById(userId)
-    next()
-  } else {
-    next()
+  if (exp < Date.now().valueOf() / 1000) {
+    return res.status(401).json({error: 'JWT token has expired, please login to obtain a new one'})
   }
+
+  req.user = await UserModel.findById(userId)
+
+  next()
 }
 
 module.exports = {
-  allowIfLoggedin,
   grantAccess,
   isUserAuthorized
 }

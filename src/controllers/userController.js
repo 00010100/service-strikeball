@@ -63,11 +63,15 @@ const login = async (req, res, next) => {
 }
 
 const getAllUsers = async (req, res, next) => {
+  console.log('here3')
   try {
     const users = await UserModel.find()
 
     res.status(200).json({data: users})
+    console.log('here4')
   } catch (err) {
+    console.log('here5')
+
     next(err)
   }
 }
