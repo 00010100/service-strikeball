@@ -1,5 +1,5 @@
 const {roles} = require('../roles')
-const {verifyToken} = require('../utils')
+const {verifyToken, errorHandler} = require('../utils')
 const {UserModel} = require('../models')
 
 const grantAccess = (action, resource) => {
@@ -9,13 +9,14 @@ const grantAccess = (action, resource) => {
 
       console.log('permission', permission)
       if (!permission.granted) {
-        return res
-          .status(401)
-          .json({error: "You don't have enough permission to perform this action"})
+        // return res
+        //   .status(403)
+        //   .json({error: "You don't have enough permission to perform this action"})
+        return errorHandler(next, {code: 403})
       }
       next()
     } catch (error) {
-      next(error)
+      errorHandler(next)
     }
   }
 }
@@ -28,14 +29,17 @@ const isUserAuthorized = async (req, res, next) => {
     const {userId, exp} = verifyToken(accessToken)
 
     if (exp < Date.now().valueOf() / 1000) {
-      return res.status(401).json({error: 'JWT token has expired, please login to obtain a new one'})
+      // return res
+      //   .status(401)
+      //   .json({error: 'JWT token has expired, please login to obtain a new one'})
+      return errorHandler(next, {code: 401})
     }
 
     req.user = await UserModel.findById(userId)
 
     next()
   } catch (err) {
-    next(err)
+    errorHandler(next)
   }
 }
 

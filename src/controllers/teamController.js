@@ -6,6 +6,12 @@ const createTeam = async (req, res, next) => {
   try {
     const {title} = req.body
 
+    const team = await TeamModel.findOne({title})
+
+    if (team) {
+      return errorHandler(next, {code: 409})
+    }
+
     const newTeam = new TeamModel({title})
 
     await newTeam.save()
@@ -38,8 +44,8 @@ const getTeamById = async (req, res, next) => {
 
 const addManagerToTeam = async (req, res, next) => {
   try {
-    const user = res.locals.loggedInUser
-    const {title} = req.body
+    const {user, body} = req
+    const {title} = body
 
     if (user.role !== 'manager') {
       // return res.status(400).json({error: 'This type of user cannot be added to team like manager'})
@@ -68,8 +74,9 @@ const addManagerToTeam = async (req, res, next) => {
 
 const requestToTeam = async (req, res, next) => {
   try {
-    const {title} = req.body
-    const {_id, email, role, accessToken} = res.locals.loggedInUser
+    const {user, body} = req
+    const {_id, email, role, accessToken} = user
+    const {title} = body
 
     if (role !== 'player') {
       // return res.status(400).json({error: 'This type of user cannot be added to the team'})
