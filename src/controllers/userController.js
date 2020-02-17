@@ -2,7 +2,7 @@ const {UserModel} = require('../models')
 const {hashPassword, validatePassword, createToken, verifyToken} = require('../utils')
 const sgMail = require('../sendgrid')
 
-exports.signUp = async (req, res, next) => {
+signUp = async (req, res, next) => {
   try {
     const {email, name, role, password, team} = req.body
     const hashedPassword = await hashPassword(password)
@@ -32,7 +32,7 @@ exports.signUp = async (req, res, next) => {
   }
 }
 
-exports.login = async (req, res, next) => {
+login = async (req, res, next) => {
   try {
     const {email, password} = req.body
 
@@ -62,7 +62,7 @@ exports.login = async (req, res, next) => {
   }
 }
 
-exports.getAllUsers = async (req, res, next) => {
+getAllUsers = async (req, res, next) => {
   try {
     const users = await UserModel.find()
 
@@ -72,7 +72,7 @@ exports.getAllUsers = async (req, res, next) => {
   }
 }
 
-exports.getUserById = async (req, res, next) => {
+getUserById = async (req, res, next) => {
   try {
     const user = await UserModel.findById(req.params.id)
 
@@ -86,7 +86,7 @@ exports.getUserById = async (req, res, next) => {
   }
 }
 
-exports.deleteUserById = async (req, res, next) => {
+deleteUserById = async (req, res, next) => {
   try {
     const user = await UserModel.findByIdAndDelete(req.params.id)
 
@@ -96,7 +96,7 @@ exports.deleteUserById = async (req, res, next) => {
   }
 }
 
-exports.confirmationUserEmail = async (req, res, next) => {
+confirmationUserEmail = async (req, res, next) => {
   try {
     const {userId} = verifyToken(req.params.token)
 
@@ -118,4 +118,13 @@ exports.confirmationUserEmail = async (req, res, next) => {
   } catch (err) {
     next(err)
   }
+}
+
+module.exports = {
+  signUp,
+  login,
+  getAllUsers,
+  getUserById,
+  deleteUserById,
+  confirmationUserEmail
 }

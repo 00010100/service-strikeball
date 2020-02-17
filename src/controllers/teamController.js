@@ -2,7 +2,7 @@ const {TeamModel, UserModel} = require('../models')
 const sgMail = require('../sendgrid')
 const {verifyToken} = require('../utils')
 
-exports.createTeam = async (req, res, next) => {
+createTeam = async (req, res, next) => {
   try {
     const {title} = req.body
 
@@ -16,7 +16,7 @@ exports.createTeam = async (req, res, next) => {
   }
 }
 
-exports.getAllTeams = async (req, res, next) => {
+getAllTeams = async (req, res, next) => {
   try {
     const teams = await TeamModel.find()
 
@@ -26,7 +26,7 @@ exports.getAllTeams = async (req, res, next) => {
   }
 }
 
-exports.getTeamById = async (req, res, next) => {
+getTeamById = async (req, res, next) => {
   try {
     const team = await TeamModel.findById(req.params.id)
 
@@ -36,7 +36,7 @@ exports.getTeamById = async (req, res, next) => {
   }
 }
 
-exports.addManagerToTeam = async (req, res, next) => {
+addManagerToTeam = async (req, res, next) => {
   try {
     const user = res.locals.loggedInUser
     const {title} = req.body
@@ -63,7 +63,7 @@ exports.addManagerToTeam = async (req, res, next) => {
   }
 }
 
-exports.requestToTeam = async (req, res, next) => {
+requestToTeam = async (req, res, next) => {
   try {
     const {title} = req.body
     const {_id, email, role, accessToken} = res.locals.loggedInUser
@@ -108,7 +108,7 @@ exports.requestToTeam = async (req, res, next) => {
   }
 }
 
-exports.approveUserToTeam = async (req, res, next) => {
+approveUserToTeam = async (req, res, next) => {
   try {
     const {token, title, role} = req.query
     const {email: managerEmail} = req.user
@@ -158,7 +158,7 @@ exports.approveUserToTeam = async (req, res, next) => {
   }
 }
 
-exports.deleteTeamById = async (req, res, next) => {
+deleteTeamById = async (req, res, next) => {
   try {
     const team = await TeamModel.findByIdAndDelete(req.params.id)
 
@@ -166,4 +166,14 @@ exports.deleteTeamById = async (req, res, next) => {
   } catch (err) {
     next(err)
   }
+}
+
+module.exports = {
+  createTeam,
+  getAllTeams,
+  getTeamById,
+  addManagerToTeam,
+  requestToTeam,
+  approveUserToTeam,
+  deleteTeamById
 }
