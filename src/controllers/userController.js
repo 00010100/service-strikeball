@@ -13,6 +13,8 @@ const signUp = async (req, res, next) => {
 
     newUser.accessToken = accessToken
 
+    await newUser.save()
+
     if (role === 'manager') {
       const link = `${process.env.SERVER}/confirmation/${accessToken}`
       sgMail.send({
@@ -23,8 +25,6 @@ const signUp = async (req, res, next) => {
         html: `<strong>Click link to approvement this user ${email}: <a target="_blank" href="${link}">${link}</a></strong>`
       })
     }
-
-    await newUser.save()
 
     res.status(201).json({data: newUser, accessToken})
   } catch (err) {
