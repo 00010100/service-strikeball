@@ -6,6 +6,7 @@ const {
   parseRoutesPath
 } = require('./common')
 const errorHandler = require('./errorHandler')
+const validate = require('./validate')
 
 module.exports = {
   validatePassword,
@@ -13,5 +14,6 @@ module.exports = {
   createToken,
   verifyToken,
   parseRoutesPath,
-  errorHandler
+  errorHandler,
+  validate
 }

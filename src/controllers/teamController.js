@@ -1,9 +1,16 @@
 const {TeamModel, UserModel} = require('../models')
 const sgMail = require('../sendgrid')
-const {verifyToken, errorHandler} = require('../utils')
+const schemas = require('../schemas')
+const {verifyToken, errorHandler, validate} = require('../utils')
 
 const createTeam = async (req, res, next) => {
   try {
+    const isValid = validate(schemas.titleSchema)(req.body)
+
+    if (Array.isArray(isValid)) {
+      return errorHandler(next, {code: 400})
+    }
+
     const {title} = req.body
 
     const team = await TeamModel.findOne({title})
@@ -44,6 +51,12 @@ const getTeamById = async (req, res, next) => {
 
 const addManagerToTeam = async (req, res, next) => {
   try {
+    const isValid = validate(schemas.titleSchema)(req.body)
+
+    if (Array.isArray(isValid)) {
+      return errorHandler(next, {code: 400})
+    }
+
     const {user, body} = req
     const {title} = body
 
@@ -74,6 +87,12 @@ const addManagerToTeam = async (req, res, next) => {
 
 const requestToTeam = async (req, res, next) => {
   try {
+    const isValid = validate(schemas.titleSchema)(req.body)
+
+    if (Array.isArray(isValid)) {
+      return errorHandler(next, {code: 400})
+    }
+
     const {user, body} = req
     const {_id, email, role, accessToken} = user
     const {title} = body
@@ -125,6 +144,12 @@ const requestToTeam = async (req, res, next) => {
 
 const approveUserToTeam = async (req, res, next) => {
   try {
+    const isValid = validate(schemas.approveSchema)(req.query)
+
+    if (Array.isArray(isValid)) {
+      return errorHandler(next, {code: 400})
+    }
+
     const {token, title, role} = req.query
     const {email: managerEmail} = req.user
     const {userId} = verifyToken(token)
@@ -180,6 +205,12 @@ const approveUserToTeam = async (req, res, next) => {
 
 const deleteTeamById = async (req, res, next) => {
   try {
+    const isValid = validate(schemas.mongoIdSchema)(req.params)
+
+    if (Array.isArray(isValid)) {
+      return errorHandler(next, {code: 400})
+    }
+
     const team = await TeamModel.findByIdAndDelete(req.params.id)
 
     return res.status(200).json({data: team, message: 'Team has been deleted'})

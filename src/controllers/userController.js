@@ -1,10 +1,25 @@
 const {UserModel} = require('../models')
-const {hashPassword, validatePassword, createToken, verifyToken, errorHandler} = require('../utils')
+const {
+  hashPassword,
+  validatePassword,
+  createToken,
+  verifyToken,
+  errorHandler,
+  validate
+} = require('../utils')
+
+const schemas = require('../schemas')
 const sgMail = require('../sendgrid')
 
 const signUp = async (req, res, next) => {
   try {
     const {email, name, role, password, team} = req.body
+
+    const isValid = validate(schemas.signUpSchema)(req.body)
+
+    if (Array.isArray(isValid)) {
+      return errorHandler(next, {code: 400})
+    }
 
     const user = await UserModel.findOne({email})
 
@@ -42,6 +57,12 @@ const signUp = async (req, res, next) => {
 const login = async (req, res, next) => {
   try {
     const {email, password} = req.body
+
+    const isValid = validate(schemas.loginSchema)(req.body)
+
+    if (Array.isArray(isValid)) {
+      return errorHandler(next, {code: 400})
+    }
 
     const user = await UserModel.findOne({email})
 
@@ -84,6 +105,12 @@ const getAllUsers = async (req, res, next) => {
 
 const getUserById = async (req, res, next) => {
   try {
+    const isValid = validate(schemas.mongoIdSchema)(req.params)
+
+    if (Array.isArray(isValid)) {
+      return errorHandler(next, {code: 400})
+    }
+
     const user = await UserModel.findById(req.params.id)
 
     if (!user) {
@@ -100,6 +127,12 @@ const getUserById = async (req, res, next) => {
 
 const deleteUserById = async (req, res, next) => {
   try {
+    const isValid = validate(schemas.mongoIdSchema)({id: req.params.id})
+
+    if (Array.isArray(isValid)) {
+      return errorHandler(next, {code: 400})
+    }
+
     const user = await UserModel.findByIdAndDelete(req.params.id)
 
     res.status(200).json({data: user, message: 'User has been deleted'})
