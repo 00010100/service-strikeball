@@ -1,11 +1,11 @@
 const express = require('express')
 const http = require('http')
 const path = require('path')
-const mongoose = require('mongoose')
 const helmet = require('helmet')
 const cors = require('cors')
 
 require('dotenv').config()
+require('./db');
 
 const {auth, notFoundRoutePath, closingErrorHandler, requestLogger} = require('./middlewares')
 const routes = require('./routes')
@@ -14,12 +14,6 @@ const {logger} = require('./utils')
 const app = express()
 
 const httpServer = http.createServer(app)
-
-mongoose
-  .connect(process.env.DATABASE_URL, {useNewUrlParser: true, useUnifiedTopology: true})
-  .then(() => logger.db('Connected to mongodb'))
-  .catch((err) => logger.db(`Connection to db error timed out: ${err}`))
-// mongoose.set('debug', true)
 
 app.use(helmet())
 app.use(cors())

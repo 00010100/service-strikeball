@@ -81,9 +81,9 @@ const addManagerToTeam = async (req, res, next) => {
       return errorHandler(next, {code: 409})
     }
 
-    const updatedTeam = await TeamModel.findOneAndUpdate({_id: team._id}, {managerId: user})
+    await TeamModel.updateOne({_id: team._id}, {managerId: user})
 
-    res.status(200).json({data: updatedTeam, message: 'Manager was added to the team'})
+    res.status(200).json({data: team, message: 'Manager was added to the team'})
   } catch (err) {
     errorHandler(next)
   }

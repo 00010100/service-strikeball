@@ -19,25 +19,25 @@ const router = Router()
  *
  * @apiSuccessExample {json} Success-Response:
  * {
-    "data": [
-      {
-        "playersId": [],
-        "playersCount": 0,
-        "managerId": null,
-        "_id": "5e4e6e721894220189079b67",
-        "title": "first team",
-        "createdAt": "2020-02-20T11:33:06.575Z",
-        "updatedAt": "2020-02-20T11:33:06.575Z",
-        "__v": 0
-      }
-    ]
+      "data": [
+         {
+            "playersId": [],
+            "playersCount": 0,
+            "managerId": null,
+            "_id": "5e4e6e721894220189079b67",
+            "title": "first team",
+            "createdAt": "2020-02-20T11:33:06.575Z",
+            "updatedAt": "2020-02-20T11:33:06.575Z",
+            "__v": 0
+         }
+      ]
  * }
  *
  * @apiErrorExample {json} Error-Response:
  * {
-    "code": 409,
-    "message": "Conflict. Data already exist",
-    "body": {}
+   "code": 409,
+   "message": "Conflict. Data already exist",
+   "body": {}
  * }
  */
 router.get('/', teamController.getAllTeams)
@@ -61,23 +61,23 @@ router.get('/', teamController.getAllTeams)
  *
  * @apiSuccessExample {json} Success-Response:
  * {
-    "data": {
-        "playersId": [],
-        "playersCount": 0,
-        "managerId": null,
-        "_id": "5e4e6e721894220189079b67",
-        "title": "first team",
-        "createdAt": "2020-02-20T11:33:06.575Z",
-        "updatedAt": "2020-02-20T11:33:06.575Z",
-        "__v": 0
-    }
+      "data": {
+         "playersId": [],
+         "playersCount": 0,
+         "managerId": null,
+         "_id": "5e4e6e721894220189079b67",
+         "title": "first team",
+         "createdAt": "2020-02-20T11:33:06.575Z",
+         "updatedAt": "2020-02-20T11:33:06.575Z",
+         "__v": 0
+      }
  * }
  *
  * @apiErrorExample {json} Error-Response:
  * {
-    "code": 409,
-    "message": "Conflict. Data already exist",
-    "body": {}
+      "code": 409,
+      "message": "Conflict. Data already exist",
+      "body": {}
  * }
  */
 router.post('/', teamController.createTeam)
@@ -101,23 +101,23 @@ router.post('/', teamController.createTeam)
  *
  * @apiSuccessExample {json} Success-Response:
  * {
-    "data": {
-        "playersId": ["5e4e5e721894320189079b61"],
-        "playersCount": 1,
-        "managerId": "5e4e6e721894320189079b62",
-        "_id": "5e4e6e721894220189079b67",
-        "title": "first team",
-        "createdAt": "2020-02-20T11:33:06.575Z",
-        "updatedAt": "2020-02-20T11:33:06.575Z",
-        "__v": 0
-    }
+      "data": {
+         "playersId": ["5e4e5e721894320189079b61"],
+         "playersCount": 1,
+         "managerId": "5e4e6e721894320189079b62",
+         "_id": "5e4e6e721894220189079b67",
+         "title": "first team",
+         "createdAt": "2020-02-20T11:33:06.575Z",
+         "updatedAt": "2020-02-20T11:33:06.575Z",
+         "__v": 0
+      }
  * }
  *
  * @apiErrorExample {json} Error-Response:
  * {
-    "code": 409,
-    "message": "Conflict. Data already exist",
-    "body": {}
+      "code": 409,
+      "message": "Conflict. Data already exist",
+      "body": {}
  * }
  */
 router.post('/requestToTeam', teamController.requestToTeam)
@@ -143,23 +143,23 @@ router.get('/approveUserToTeam', teamController.approveUserToTeam)
  *
  * @apiSuccessExample {json} Success-Response:
  * {
-    "data": {
-        "playersId": [],
-        "playersCount": 0,
-        "managerId": "5e4e6e721894320189079b62",
-        "_id": "5e4e6e721894220189079b67",
-        "title": "first team",
-        "createdAt": "2020-02-20T11:33:06.575Z",
-        "updatedAt": "2020-02-20T11:33:06.575Z",
-        "__v": 0
-    }
+      "data": {
+         "playersId": [],
+         "playersCount": 0,
+         "managerId": "5e4e6e721894320189079b62",
+         "_id": "5e4e6e721894220189079b67",
+         "title": "first team",
+         "createdAt": "2020-02-20T11:33:06.575Z",
+         "updatedAt": "2020-02-20T11:33:06.575Z",
+         "__v": 0
+      }
  * }
  *
  * @apiErrorExample {json} Error-Response:
  * {
-    "code": 409,
-    "message": "Conflict. Data already exist",
-    "body": {}
+      "code": 409,
+      "message": "Conflict. Data already exist",
+      "body": {}
  * }
  */
 router.post('/addManagerToTeam', teamController.addManagerToTeam)
@@ -182,23 +182,23 @@ router.post('/addManagerToTeam', teamController.addManagerToTeam)
  *
  * @apiSuccessExample {json} Success-Response:
  * {
-    "data": {
-        "playersId": [],
-        "playersCount": 0,
-        "managerId": null,
-        "_id": "5e4e6e721894220189079b67",
-        "title": "first team",
-        "createdAt": "2020-02-20T11:33:06.575Z",
-        "updatedAt": "2020-02-20T11:33:06.575Z",
-        "__v": 0
-    }
+      "data": {
+         "playersId": [],
+         "playersCount": 0,
+         "managerId": null,
+         "_id": "5e4e6e721894220189079b67",
+         "title": "first team",
+         "createdAt": "2020-02-20T11:33:06.575Z",
+         "updatedAt": "2020-02-20T11:33:06.575Z",
+         "__v": 0
+      }
  * }
  *
  * @apiErrorExample {json} Error-Response:
  * {
-    "code": 409,
-    "message": "Conflict. Data already exist",
-    "body": {}
+   "code": 409,
+   "message": "Conflict. Data already exist",
+   "body": {}
  * }
  */
 router.get('/:id', teamController.getTeamById)
@@ -221,24 +221,24 @@ router.get('/:id', teamController.getTeamById)
  *
  * @apiSuccessExample {json} Success-Response:
  * {
-    "data": {
-        "playersId": [],
-        "playersCount": 0,
-        "managerId": null,
-        "_id": "5e4e6e721894220189079b67",
-        "title": "first team",
-        "createdAt": "2020-02-20T11:33:06.575Z",
-        "updatedAt": "2020-02-20T11:33:06.575Z",
-        "__v": 0
-    },
-    "message": "Team has been deleted"
+   "data": {
+      "playersId": [],
+      "playersCount": 0,
+      "managerId": null,
+      "_id": "5e4e6e721894220189079b67",
+      "title": "first team",
+      "createdAt": "2020-02-20T11:33:06.575Z",
+      "updatedAt": "2020-02-20T11:33:06.575Z",
+      "__v": 0
+   },
+   "message": "Team has been deleted"
  * }
  *
  * @apiErrorExample {json} Error-Response:
  * {
-    "code": 400,
-    "message": "Sent data is not valid",
-    "body": {}
+      "code": 400,
+      "message": "Sent data is not valid",
+      "body": {}
  * }
  */
 router.delete('/:id', teamController.deleteTeamById)

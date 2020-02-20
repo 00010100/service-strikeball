@@ -5,7 +5,8 @@ const {
   createToken,
   verifyToken,
   errorHandler,
-  validate
+  validate,
+  logger
 } = require('../utils')
 
 const schemas = require('../schemas')
@@ -85,7 +86,7 @@ const login = async (req, res, next) => {
 
     const accessToken = createToken(user._id)
 
-    await UserModel.findOneAndUpdate({_id: user._id}, {accessToken})
+    await UserModel.updateOne({_id: user._id}, {accessToken})
 
     res.status(200).json({data: {email: user.email, role: user.role}, accessToken})
   } catch (err) {
@@ -162,7 +163,7 @@ const confirmationUserEmail = async (req, res, next) => {
     }
 
     if (user.role === 'manager') {
-      await UserModel.findOneAndUpdate({_id: userId}, {confirmed: true})
+      await UserModel.updateOne({_id: userId}, {confirmed: true})
     }
 
     res.status(200).json({data: user, message: 'This manager was confirmed'})
