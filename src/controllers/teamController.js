@@ -97,8 +97,6 @@ const requestToTeam = async (req, res, next) => {
       return errorHandler(next, {code: 400})
     }
 
-    console.log(req.user)
-
     if (!req.user) {
       return errorHandler(next, {code: 404})
     }

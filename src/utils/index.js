@@ -7,6 +7,7 @@ const {
 } = require('./common')
 const errorHandler = require('./errorHandler')
 const validate = require('./validate')
+const logger = require('./logger')
 
 module.exports = {
   validatePassword,
@@ -15,5 +16,6 @@ module.exports = {
   verifyToken,
   parseRoutesPath,
   errorHandler,
-  validate
+  validate,
+  logger
 }

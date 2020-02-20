@@ -2,28 +2,29 @@ const express = require('express')
 const http = require('http')
 const path = require('path')
 const mongoose = require('mongoose')
-const morgan = require('morgan')
 const helmet = require('helmet')
 const cors = require('cors')
 
 require('dotenv').config()
 
-const {auth, notFoundRoutePath, closingErrorHandler} = require('./middlewares')
+const {auth, notFoundRoutePath, closingErrorHandler, requestLogger} = require('./middlewares')
 const routes = require('./routes')
+const {logger} = require('./utils')
 
 const app = express()
 
-const httpServer = http.createServer(app);
+const httpServer = http.createServer(app)
 
 mongoose
   .connect(process.env.DATABASE_URL, {useNewUrlParser: true, useUnifiedTopology: true})
-  .then(() => console.info('Connected to mongodb'))
-  .catch((err) => console.info(`Error: ${err}`))
+  .then(() => logger.db('Connected to mongodb'))
+  .catch((err) => logger.db(`Connection to db error timed out: ${err}`))
+// mongoose.set('debug', true)
 
-app.use(morgan('common'))
 app.use(helmet())
 app.use(cors())
 app.use(express.json())
+app.use(requestLogger)
 
 app.use(auth.isUserAuthorized)
 
@@ -42,5 +43,5 @@ app.use(closingErrorHandler)
 const port = process.env.PORT || 5000
 
 httpServer.listen(port, () => {
-  console.info(`Server started at http://localhost:${port}`)
+  logger.info(`Server started at http://localhost:${port}`)
 })

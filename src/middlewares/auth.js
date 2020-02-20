@@ -7,7 +7,6 @@ const grantAccess = (action, resource) => {
     try {
       const permission = roles.can(req.user.role)[action](resource)
 
-      console.log('permission', permission)
       if (!permission.granted) {
         // return res
         //   .status(403)
