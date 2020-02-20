@@ -1,4 +1,5 @@
 const express = require('express')
+const http = require('http')
 const path = require('path')
 const mongoose = require('mongoose')
 const morgan = require('morgan')
@@ -11,6 +12,8 @@ const {auth, notFoundRoutePath, closingErrorHandler} = require('./middlewares')
 const routes = require('./routes')
 
 const app = express()
+
+const httpServer = http.createServer(app);
 
 mongoose
   .connect(process.env.DATABASE_URL, {useNewUrlParser: true, useUnifiedTopology: true})
@@ -38,6 +41,6 @@ app.use(closingErrorHandler)
 
 const port = process.env.PORT || 5000
 
-app.listen(port, () => {
+httpServer.listen(port, () => {
   console.info(`Server started at http://localhost:${port}`)
 })
