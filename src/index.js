@@ -1,4 +1,5 @@
 const express = require('express')
+const path = require('path')
 const mongoose = require('mongoose')
 const morgan = require('morgan')
 const helmet = require('helmet')
@@ -23,9 +24,18 @@ app.use(express.json())
 
 app.use(auth.isUserAuthorized)
 
+if (process.env.NODE_ENV === 'development') {
+  app.get('/apidoc', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'apidoc/index.html'))
+  })
+}
+
+app.use(express.static(path.join(__dirname, '..', '/apidoc')));
+
 app.use('/api/v1', routes)
 app.use((req, res, next) => notFoundRoutePath(req, res, next, routes))
 app.use(closingErrorHandler)
+
 
 const port = process.env.PORT || 5000
 

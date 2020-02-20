@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node ./src/index.js",
     "dev": "nodemon ./src/index.js",
+    "doc": "apidoc -i './src/routes' -o apidoc/",
+    "docServer": "open http://localhost:5000/api/v1/apidoc",
     "lint": "eslint"
   },
   "keywords": [],

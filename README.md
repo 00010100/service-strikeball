@@ -13,10 +13,19 @@ then change into that folder
 cd service-strikeball
 ```
 
+install the api documentation locally with npm
+```
+npm run doc
+```
+
 install the necessary packages locally with npm
-``` npm install ```
+```
+npm install
+```
 
 and start up a local server
-``` npm run dev ```
+```
+npm run dev
+```
 
-Now visit [`localhost:5000/api/v1`](http://localhost:5000/api/v1) from your browser. Now your app should be up and running.
+Now visit [`localhost:5000/apidoc`](http://localhost:5000/apidoc) from your browser. Now your app should be up and running.
