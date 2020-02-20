@@ -2,6 +2,12 @@ const {roles} = require('../roles')
 const {verifyToken, errorHandler} = require('../utils')
 const {UserModel} = require('../models')
 
+/**
+ *  Check user permission
+ *
+ * @param action
+ * @param resource
+ */
 const grantAccess = (action, resource) => {
   return async (req, res, next) => {
     try {
@@ -20,6 +26,13 @@ const grantAccess = (action, resource) => {
   }
 }
 
+/**
+ *  Check user access token
+ *
+ * @param req
+ * @param res
+ * @param next
+ */
 const isUserAuthorized = async (req, res, next) => {
   if (!req.headers['x-access-token']) return next()
 

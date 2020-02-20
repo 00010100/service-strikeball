@@ -26,9 +26,9 @@ const urlsThatIsShowedOnStart = []
  *
  * @type {String[]}
  */
-const devUrls = ['auth', 'user', 'team']
+const devUrls = []
 
-const writeLog = (req, log) => {
+const writeLog = (log) => {
   logger.http(log)
 }
 
@@ -58,7 +58,7 @@ const requestLogger = (req, res, next) => {
   }
 
   if (urlsThatIsShowedOnStart.some((x) => originalUrl.includes(x))) {
-    writeLog(req, `${clientIp} - ${method} ${originalUrl} - Request started.`)
+    writeLog(`${clientIp} - ${method} ${originalUrl} - Request started.`)
   }
 
   res.on('finish', () => {
@@ -66,7 +66,7 @@ const requestLogger = (req, res, next) => {
     const contentSize = res.get('Content-Length') || 0
     const responseTime = Date.now() - start
     const log = `${clientIp} - ${method} ${originalUrl} - ${statusCode} [${statusMessage}] (${contentSize}b sent in ${responseTime} ms)`
-    writeLog(req, log)
+    writeLog(log)
   })
 
   return next()
