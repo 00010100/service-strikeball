@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const {Schema} = mongoose
+const {Schema, model} = mongoose
 
 const TeamSchema = new Schema(
   {
@@ -14,6 +14,6 @@ const TeamSchema = new Schema(
   }
 )
 
-const Team = mongoose.model('team', TeamSchema)
+const Team = model('team', TeamSchema)
 
 module.exports = Team

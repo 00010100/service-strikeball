@@ -121,24 +121,25 @@ const getUserById = async (req, res, next) => {
 
     res.status(200).json({data: user})
   } catch (err) {
-    res.status(400)
     errorHandler(next)
   }
 }
 
 const deleteUserById = async (req, res, next) => {
   try {
-    const isValid = validate(schemas.mongoIdSchema)({id: req.params.id})
+    const isValid = validate(schemas.mongoIdSchema)(req.params)
 
     if (Array.isArray(isValid)) {
       return errorHandler(next, {code: 400})
     }
 
-    const user = await UserModel.findByIdAndDelete(req.params.id)
+    const user = await UserModel.findById(req.params.id)
 
     if (!user) {
       return errorHandler(next, {code: 404})
     }
+
+    await UserModel.deleteOne({_id: req.params.id})
 
     res.status(200).json({data: user, message: 'User has been deleted'})
   } catch (err) {
