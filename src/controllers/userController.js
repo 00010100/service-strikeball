@@ -135,6 +135,10 @@ const deleteUserById = async (req, res, next) => {
 
     const user = await UserModel.findByIdAndDelete(req.params.id)
 
+    if (!user) {
+      return errorHandler(next, {code: 404})
+    }
+
     res.status(200).json({data: user, message: 'User has been deleted'})
   } catch (err) {
     errorHandler(next)

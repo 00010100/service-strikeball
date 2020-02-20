@@ -1,8 +1,7 @@
 const {Router} = require('express')
+const {userController} = require('../controllers')
 
 const router = Router()
-
-const {userController, teamController} = require('../controllers')
 
 /**
  * @apiName sign up
@@ -83,46 +82,11 @@ router.post('/signUp', userController.signUp)
  */
 router.post('/login', userController.login)
 
-router.get(
-  '/users',
-  // grantAccess('readAny', 'playerProfile'),
-  userController.getAllUsers
-)
-/**
- * @apiName getUserById
- * @api {GET} /api/v1/user/:id Get user by id
- * @apiVersion 0.0.1
- * @apiGroup user
- * @apiHeader {String} Content-Type=application/json
- * @apiHeader {String} x-access-token=access token
- *
- * @apiExample {curl} Example usage:
-   *     curl 'http://localhost:5000/api/v1/user/id'
-   *      -H "Content-Type: application/json"
-   *     -H "x-access-token=''
-   *      -X GET
- *
- */
-router.get('/user/:id', userController.getUserById)
-/**
- * @apiDefine userObject
- * @apiName removeUserById
- *
- */
-router.delete('/user/:id', userController.deleteUserById)
 /**
  * @apiDefine userObject
  * @apiName confirmToken
  *
  */
 router.get('/confirmation/:token', userController.confirmationUserEmail)
-
-router.get('/teams', teamController.getAllTeams)
-router.post('/team', teamController.createTeam)
-router.post('/team/requestToTeam', teamController.requestToTeam)
-router.get('/team/approveUserToTeam', teamController.approveUserToTeam)
-router.post('/team/addManagerToTeam', teamController.addManagerToTeam)
-router.get('/team/:id', teamController.getTeamById)
-router.delete('/team/:id', teamController.deleteTeamById)
 
 module.exports = router

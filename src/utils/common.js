@@ -10,12 +10,9 @@ const createToken = (userId) => jwt.sign({userId}, process.env.JWT_SECRET, {expi
 
 const verifyToken = (accessToken) => jwt.verify(accessToken, process.env.JWT_SECRET)
 
-const parseRoutesPath = (routes) => routes.stack.map(({route}) => route.path)
-
 module.exports = {
   hashPassword,
   validatePassword,
   createToken,
-  verifyToken,
-  parseRoutesPath
+  verifyToken
 }

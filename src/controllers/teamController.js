@@ -57,6 +57,10 @@ const addManagerToTeam = async (req, res, next) => {
       return errorHandler(next, {code: 400})
     }
 
+    if (!req.user) {
+      return errorHandler(next, {code: 404})
+    }
+
     const {user, body} = req
     const {title} = body
 
@@ -91,6 +95,12 @@ const requestToTeam = async (req, res, next) => {
 
     if (Array.isArray(isValid)) {
       return errorHandler(next, {code: 400})
+    }
+
+    console.log(req.user)
+
+    if (!req.user) {
+      return errorHandler(next, {code: 404})
     }
 
     const {user, body} = req
@@ -212,6 +222,10 @@ const deleteTeamById = async (req, res, next) => {
     }
 
     const team = await TeamModel.findByIdAndDelete(req.params.id)
+
+    if (!team) {
+      return errorHandler(next, {code: 404})
+    }
 
     return res.status(200).json({data: team, message: 'Team has been deleted'})
   } catch (err) {
