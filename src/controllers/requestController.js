@@ -196,6 +196,7 @@ const update = async (req, res, next) => {
           team.playersCount--
           team.playersId.pull(user._id)
           await team.save()
+          await UserModel.updateOne({_id: user._id}, {team: null})
 
           break
         }
@@ -223,6 +224,10 @@ const update = async (req, res, next) => {
           const swapTeam = await TeamModel.findOne({title: request.swapTeamName})
 
           if (!swapTeam) {
+            return errorHandler(next, {code: 404})
+          }
+
+          if (!swapTeam.managerId) {
             return errorHandler(next, {code: 404})
           }
 
