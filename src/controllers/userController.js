@@ -5,8 +5,7 @@ const {
   createToken,
   verifyToken,
   errorHandler,
-  validate,
-  logger
+  validate
 } = require('../utils')
 
 const schemas = require('../schemas')
@@ -90,7 +89,7 @@ const login = async (req, res, next) => {
 
     res.status(200).json({data: {email: user.email, role: user.role}, accessToken})
   } catch (err) {
-    return errorHandler(next)
+    errorHandler(next)
   }
 }
 
