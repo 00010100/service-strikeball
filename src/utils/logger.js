@@ -46,8 +46,8 @@ const logger = createLogger({
 })
 
 module.exports = logger
-module.exports.stream = {
-  write(message) {
-    logger.log('http', message.replace(/(\r\n|\r|\n)$/, ''))
-  }
-}
+// module.exports.stream = {
+//   write(message) {
+//     logger.log('http', message.replace(/(\r\n|\r|\n)$/, ''))
+//   }
+// }

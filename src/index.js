@@ -5,7 +5,7 @@ const helmet = require('helmet')
 const cors = require('cors')
 
 require('dotenv').config()
-require('./db');
+require('./db')
 
 const {auth, notFoundRoutePath, closingErrorHandler, requestLogger} = require('./middlewares')
 const routes = require('./routes')

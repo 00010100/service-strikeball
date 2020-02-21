@@ -38,19 +38,25 @@ const isUserAuthorized = async (req, res, next) => {
 
   try {
     const accessToken = req.headers['x-access-token']
-    const {userId, exp} = verifyToken(accessToken)
+    console.log(accessToken)
+    const verified = verifyToken(accessToken)
 
-    if (exp < Date.now().valueOf() / 1000) {
+    if (!verified) {
+      return errorHandler(next, {code: 404})
+    }
+
+    if (verified.exp < Date.now().valueOf() / 1000) {
       // return res
       //   .status(401)
       //   .json({error: 'JWT token has expired, please login to obtain a new one'})
       return errorHandler(next, {code: 401})
     }
 
-    req.user = await UserModel.findById(userId)
+    req.user = await UserModel.findById(verified.userId)
 
     next()
   } catch (err) {
+    console.log(err)
     errorHandler(next)
   }
 }

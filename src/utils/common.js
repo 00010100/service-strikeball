@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const errorHandler = require('./errorHandler')
 
 const hashPassword = async (password) => bcrypt.hash(password, 10)
 
@@ -8,7 +9,13 @@ const validatePassword = async (plainPassword, hashedPassword) =>
 
 const createToken = (userId) => jwt.sign({userId}, process.env.JWT_SECRET, {expiresIn: '1d'})
 
-const verifyToken = (accessToken) => jwt.verify(accessToken, process.env.JWT_SECRET)
+const verifyToken = (accessToken) => {
+  try {
+    return jwt.verify(accessToken, process.env.JWT_SECRET)
+  } catch (err) {
+    return null
+  }
+}
 
 module.exports = {
   hashPassword,

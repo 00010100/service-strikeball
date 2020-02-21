@@ -160,9 +160,13 @@ const approveUserToTeam = async (req, res, next) => {
 
     const {token, title, role} = req.query
     const {email: managerEmail} = req.user
-    const {userId} = verifyToken(token)
+    const verified = verifyToken(token)
 
-    const user = await UserModel.findById(userId)
+    if (!verified) {
+      return errorHandler(next, {code: 404})
+    }
+
+    const user = await UserModel.findById(verified.userId)
 
     if (!user) {
       // return res.status(404).json({error: 'User does not exist'})

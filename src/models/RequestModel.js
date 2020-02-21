@@ -6,7 +6,8 @@ const RequestSchema = new Schema(
   {
     title: {type: String, required: true, trim: true},
     status: {type: String, default: 'pending', enum: ['accepted', 'declined', 'pending']},
-    from: {type: 'ObjectId'},
+    from: {type: String, require: true},
+    teamName: {type: String, required: true, trim: true},
     to: {type: String, trim: true, required: true, lowercase: true},
     type: {type: String, enum: ['join', 'change', 'leave'], required: true}
   },

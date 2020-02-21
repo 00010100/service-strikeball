@@ -38,7 +38,7 @@ const signUp = async (req, res, next) => {
     await newUser.save()
 
     if (role === 'manager') {
-      const link = `${process.env.SERVER}/confirmation/${accessToken}`
+      const link = `${process.env.SERVER}/auth/confirmation/${accessToken}`
       sgMail.send({
         to: 'e0001101004+admin@gmail.com',
         from: email,
@@ -148,9 +148,13 @@ const deleteUserById = async (req, res, next) => {
 
 const confirmationUserEmail = async (req, res, next) => {
   try {
-    const {userId} = verifyToken(req.params.token)
+    const verified = verifyToken(req.params.token)
 
-    const user = await UserModel.findById(userId)
+    if (!verified) {
+      return errorHandler(next, {code: 404})
+    }
+
+    const user = await UserModel.findById(verified.userId)
 
     if (!user) {
       // return res.status(404).json({error: 'User does not exist'})
@@ -163,7 +167,7 @@ const confirmationUserEmail = async (req, res, next) => {
     }
 
     if (user.role === 'manager') {
-      await UserModel.updateOne({_id: userId}, {confirmed: true})
+      await UserModel.updateOne({_id: verified.userId}, {confirmed: true})
     }
 
     res.status(200).json({data: user, message: 'This manager was confirmed'})

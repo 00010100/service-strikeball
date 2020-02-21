@@ -5,7 +5,7 @@ const router = Router()
 
 /**
  * @apiName sign up
- * @api {POST} /api/v1/signUp Registration
+ * @api {POST} /api/v1/auth/signUp Registration
  * @apiVersion 0.0.1
  * @apiGroup auth
  * @apiHeader {String} Content-Type=application/json
@@ -50,7 +50,7 @@ router.post('/signUp', userController.signUp)
 
 /**
  * @apiName login
- * @api {POST} /api/v1/login Login
+ * @api {POST} /api/v1/auth/login Login
  * @apiVersion 0.0.1
  * @apiGroup auth
  * @apiHeader {String} Content-Type=application/json
@@ -82,11 +82,6 @@ router.post('/signUp', userController.signUp)
  */
 router.post('/login', userController.login)
 
-/**
- * @apiDefine userObject
- * @apiName confirmToken
- *
- */
 router.get('/confirmation/:token', userController.confirmationUserEmail)
 
 module.exports = router
