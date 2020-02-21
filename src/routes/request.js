@@ -1,6 +1,6 @@
 const {Router} = require('express')
 const {requestController} = require('../controllers')
-const middlewares = require('../middlewares')
+const {auth} = require('../middlewares')
 
 const router = Router()
 
@@ -169,6 +169,36 @@ router.get('/:id', requestController.getById)
  */
 router.delete('/:id', requestController.cancel)
 
-router.put('/:id', middlewares.auth.grantAccess('update', 'request'), requestController.update)
+/**
+ * @apiName update request
+ * @api {PUT} /api/v1/request/:id Update request
+ * @apiVersion 0.0.1
+ * @apiGroup request
+ * @apiHeader {String} Content-Type=application/json
+ * @apiHeader {String} x-access-token=token
+ *
+ * @apiParam {Enum[String]} status approved | declined
+ *
+ * @apiExample {curl} Example usage:
+ * curl 'http://localhost:5000/api/v1/request/5e4fbcd320350d176d29b7ff'
+ * -H "Content-Type: application/json"
+ * -H "x-access-token: some token"
+ * -X PUT
+ * -d {"status": "approved"}
+ *
+ * @apiSuccessExample {json} Success-Response:
+ * {
+    "data": null,
+    "message": "Request successfully approved"
+ * }
+ *
+ * @apiErrorExample {json} Error-Response:
+ * {
+    "code": 404,
+    "message": "Information not found",
+    "body": {}
+ * }
+ */
+router.put('/:id', auth.grantAccess('update', 'request'), requestController.update)
 
 module.exports = router
