@@ -38,7 +38,6 @@ const isUserAuthorized = async (req, res, next) => {
 
   try {
     const accessToken = req.headers['x-access-token']
-    console.log(accessToken)
     const verified = verifyToken(accessToken)
 
     if (!verified) {

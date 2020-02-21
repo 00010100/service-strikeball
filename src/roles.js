@@ -8,6 +8,8 @@ exports.roles = (() => {
   ac.grant('manager')
     .extend('player')
     .readAny('playerProfile')
+    .readAny('teamProfile')
+    .updateAny('request')
     .deleteAny('playerProfile')
 
   ac.grant('admin')

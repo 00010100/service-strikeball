@@ -1,5 +1,6 @@
 const {Router} = require('express')
 const {requestController} = require('../controllers')
+const middlewares = require('../middlewares')
 
 const router = Router()
 
@@ -167,5 +168,7 @@ router.get('/:id', requestController.getById)
  * }
  */
 router.delete('/:id', requestController.cancel)
+
+router.put('/:id', middlewares.auth.grantAccess('update', 'request'), requestController.update)
 
 module.exports = router

@@ -4,6 +4,7 @@ const signUpSchema = require('./signUpSchema')
 const titleSchema = require('./titleSchema')
 const approveSchema = require('./approveSchema')
 const requestCreateSchema = require('./requestCreateSchema')
+const requestUpdateSchema = require('./requestUpdateSchema')
 
 module.exports = {
   mongoIdSchema,
@@ -11,5 +12,6 @@ module.exports = {
   signUpSchema,
   titleSchema,
   approveSchema,
-  requestCreateSchema
+  requestCreateSchema,
+  requestUpdateSchema
 }
