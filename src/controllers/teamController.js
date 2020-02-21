@@ -49,6 +49,22 @@ const getTeamById = async (req, res, next) => {
   }
 }
 
+const getPlayersByTeam = async (req, res, next) => {
+  try {
+    const {team} = req.user
+
+    if (!team) {
+      return res.status(200).json({data: []})
+    }
+
+    const players = await UserModel.find({team})
+
+    res.status(200).json({data: players})
+  } catch (err) {
+    errorHandler(next)
+  }
+}
+
 const addManagerToTeam = async (req, res, next) => {
   try {
     const isValid = validate(schemas.titleSchema)(req.body)
@@ -242,5 +258,6 @@ module.exports = {
   addManagerToTeam,
   requestToTeam,
   approveUserToTeam,
-  deleteTeamById
+  deleteTeamById,
+  getPlayersByTeam
 }

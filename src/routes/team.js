@@ -122,7 +122,50 @@ router.post('/', teamController.createTeam)
  */
 router.post('/requestToTeam', teamController.requestToTeam)
 
-router.get('/approveUserToTeam', teamController.approveUserToTeam)
+// router.get('/approveUserToTeam', teamController.approveUserToTeam)
+
+/**
+ * @apiName get players by team
+ * @api {GET} /api/v1/team/players Get players by team
+ * @apiVersion 0.0.1
+ * @apiGroup team
+ * @apiHeader {String} Content-Type=application/json
+ * @apiHeader {String} x-access-token=token
+ *
+ * @apiExample {curl} Example usage:
+ * curl 'http://localhost:5000/api/v1/team/players'
+ * -H "Content-Type: application/json"
+ * -H "x-access-token: some token"
+ * -X GET
+ *
+ * @apiSuccessExample {json} Success-Response:
+ * {
+     "data": [
+     {
+          "confirmed": false,
+          "team": "5e4f9c99429f9442a2042060",
+          "role": "player",
+          "blocked": false,
+          "_id": "5e4fbc7acbedfd181495260e",
+          "email": "some-email_player@gmail.com",
+          "name": "player",
+          "password": "some-pass",
+          "accessToken": "some-token",
+          "createdAt": "2020-02-21T11:18:18.950Z",
+          "updatedAt": "2020-02-21T14:11:50.880Z",
+          "__v": 0
+     },
+     ]
+ * }
+ *
+ * @apiErrorExample {json} Error-Response:
+ * {
+    "code": 404,
+    "message": "Information not found",
+    "body": {}
+ * }
+ */
+router.get('/players', teamController.getPlayersByTeam)
 
 /**
  * @apiName add manager to team
