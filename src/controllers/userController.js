@@ -7,90 +7,29 @@ const {
   errorHandler,
   validate
 } = require('../utils')
+const authValidate = require('../validator/auth')
 
 const schemas = require('../schemas')
 const sgMail = require('../sendgrid')
+const {wrap} = require('../middlewares')
 
 const signUp = async (req, res, next) => {
-  try {
-    const {email, name, role, password, team} = req.body
-
-    const isValid = validate(schemas.signUpSchema)(req.body)
-
-    if (Array.isArray(isValid)) {
-      return errorHandler(next, {code: 400})
-    }
-
-    const user = await UserModel.findOne({email})
-
-    if (user) {
-      return errorHandler(next, {code: 409})
-    }
-
-    const hashedPassword = await hashPassword(password)
-
-    const newUser = new UserModel({email, name, password: hashedPassword, role, team})
-
-    const accessToken = createToken(newUser._id)
-
-    newUser.accessToken = accessToken
-
-    await newUser.save()
-
-    if (role === 'manager') {
-      const link = `${process.env.SERVER}/auth/confirmation/${accessToken}`
-      sgMail.send({
-        to: 'e0001101004+admin@gmail.com',
-        from: email,
-        subject: 'Registration approvement',
-        text: `Click link to approvement this user ${email}: <a target="_blank" href="${link}">${link}</a>`,
-        html: `<strong>Click link to approvement this user ${email}: <a target="_blank" href="${link}">${link}</a></strong>`
-      })
-    }
-
-    res.status(201).json({data: newUser, accessToken})
-  } catch (err) {
-    errorHandler(next)
-  }
+  await wrap(req, next, async () => {
+    await authValidate.signUp(req.body)
+  })
 }
 
 const login = async (req, res, next) => {
-  try {
-    const {email, password} = req.body
+  console.log('HERE????', wrap)
+  const a = await wrap(req, next, async () => {
+    const data = await authValidate.login(req.body)
 
-    const isValid = validate(schemas.loginSchema)(req.body)
-
-    if (Array.isArray(isValid)) {
-      return errorHandler(next, {code: 400})
-    }
-
-    const user = await UserModel.findOne({email})
-
-    if (!user) {
-      // return res.status(404).json({error: 'Email does not exist'})
-      return errorHandler(next, {code: 404})
-    }
-
-    const validPassword = await validatePassword(password, user.password)
-
-    if (!validPassword) {
-      // return res.status(404).json({error: 'Password is not correct'})
-      return errorHandler(next, {code: 404})
-    }
-
-    if (user.role === 'manager' && !user.confirmed) {
-      // return res.status(400).json({error: 'You need to be confirmed to access this route'})
-      return errorHandler(next, {code: 403})
-    }
-
-    const accessToken = createToken(user._id)
-
-    await UserModel.updateOne({_id: user._id}, {accessToken})
-
-    res.status(200).json({data: {email: user.email, role: user.role}, accessToken})
-  } catch (err) {
-    errorHandler(next)
-  }
+    console.log('data', data)
+    return res.status(200).json(data)
+  })
+  console.log('HERE????')
+  console.log('21312312312', a)
+  return a
 }
 
 const getAllUsers = async (req, res, next) => {

@@ -55,7 +55,7 @@ const isUserAuthorized = async (req, res, next) => {
 
     next()
   } catch (err) {
-    console.log(err)
+    console.log(JSON.stringify(err))
     errorHandler(next)
   }
 }

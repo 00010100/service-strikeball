@@ -3,7 +3,8 @@ const {
   hashPassword,
   createToken,
   verifyToken,
-  parseRoutesPath
+  parseRoutesPath,
+  convertError
 } = require('./common')
 const errorHandler = require('./errorHandler')
 const validate = require('./validate')
@@ -17,5 +18,6 @@ module.exports = {
   parseRoutesPath,
   errorHandler,
   validate,
-  logger
+  logger,
+  convertError
 }
