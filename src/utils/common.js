@@ -17,9 +17,12 @@ const verifyToken = (accessToken) => {
   }
 }
 
+const convertError = (list) => list.map(({field, message}) => ({param: field, message}))
+
 module.exports = {
   hashPassword,
   validatePassword,
   createToken,
-  verifyToken
+  verifyToken,
+  convertError
 }

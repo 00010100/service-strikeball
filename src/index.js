@@ -31,8 +31,8 @@ if (process.env.NODE_ENV === 'development') {
 app.use(express.static(path.join(__dirname, '..', '/apidoc')))
 
 app.use('/api/v1', routes)
-app.use((req, res, next) => notFoundRoutePath(req, res, next))
-app.use(closingErrorHandler)
+// app.use((req, res, next) => notFoundRoutePath(req, res, next))
+// app.use(closingErrorHandler)
 
 const port = process.env.PORT || 5000
 

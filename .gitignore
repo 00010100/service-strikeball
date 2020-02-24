@@ -108,3 +108,5 @@ dist
 
 # Apidoc
 apidoc/
+
+.DS_Store
