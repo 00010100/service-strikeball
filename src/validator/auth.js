@@ -6,31 +6,25 @@ const sgMail = require('../sendgrid')
 const login = async (data) => {
   const {email, password} = data
 
-  console.log('data', data)
-
   const errorList = validate(schemas.loginSchema)(data)
-  console.log('errorList', errorList)
   if (Array.isArray(errorList)) {
     throw convertError(errorList)
   }
 
   const user = await UserModel.findOne({email})
 
-  console.log('user', user)
-
   if (!user) {
-    console.log('user error')
-    throw [{param: 'email', message: 'User does not exist'}]
+    throw {param: 'email', message: 'User does not exist'}
   }
 
   const validPassword = await validatePassword(password, user.password)
 
   if (!validPassword) {
-    throw [{param: 'password', message: 'Password is not correct'}]
+    throw {param: 'password', message: 'Password is not correct'}
   }
 
   if (user.role === 'manager' && !user.confirmed) {
-    throw [{param: 'confirmed', message: 'You need to be confirmed to access this route'}]
+    throw {param: 'confirmed', message: 'You need to be confirmed to access this route'}
   }
 
   // change later
@@ -53,7 +47,7 @@ const signUp = async (data) => {
   const user = await UserModel.findOne({email})
 
   if (user) {
-    throw [{param: 'email', message: 'User already exist'}]
+    throw {param: 'email', message: 'User already exist'}
   }
 
   const hashedPassword = await hashPassword(password)

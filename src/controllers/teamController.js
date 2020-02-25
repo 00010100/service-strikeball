@@ -2,107 +2,53 @@ const {TeamModel, UserModel} = require('../models')
 const sgMail = require('../sendgrid')
 const schemas = require('../schemas')
 const {verifyToken, errorHandler, validate} = require('../utils')
+const {wrap} = require('../middlewares')
+const {teamValidate} = require('../validator')
 
-const createTeam = async (req, res, next) => {
-  try {
-    const isValid = validate(schemas.titleSchema)(req.body)
+const createTeam = (req, res, next) => {
+  console.log('createTeam')
+  wrap(req, res, next, async () => {
+    const data = await teamValidate.create(req.body)
 
-    if (Array.isArray(isValid)) {
-      return errorHandler(next, {code: 400})
-    }
-
-    const {title} = req.body
-
-    const team = await TeamModel.findOne({title})
-
-    if (team) {
-      return errorHandler(next, {code: 409})
-    }
-
-    const newTeam = new TeamModel({title})
-
-    await newTeam.save()
-
-    res.status(201).json({data: newTeam})
-  } catch (err) {
-    errorHandler(next)
-  }
+    res.status(200).json(data)
+  })
 }
 
-const getAllTeams = async (req, res, next) => {
-  try {
-    const teams = await TeamModel.find()
+const getAllTeams = (req, res, next) => {
+  console.log('getAllTeams')
+  wrap(req, res, next, async () => {
+    // TODO - change
+    const data = await TeamModel.find()
 
-    res.status(200).json({data: teams})
-  } catch (err) {
-    errorHandler(next)
-  }
+    res.status(200).json(data)
+  })
 }
 
-const getTeamById = async (req, res, next) => {
-  try {
-    const team = await TeamModel.findById(req.params.id)
+const getTeamById = (req, res, next) => {
+  console.log('getTeamById')
+  wrap(req, res, next, async () => {
+    const data = await teamValidate.getById(req.params)
 
-    res.status(200).json({data: team})
-  } catch (err) {
-    errorHandler(next)
-  }
+    res.status(200).json(data)
+  })
 }
 
-const getPlayersByTeam = async (req, res, next) => {
-  try {
-    const {team} = req.user
+const getPlayersByTeam = (req, res, next) => {
+  console.log('getPlayersByTeam')
+  wrap(req, res, next, async () => {
+    const data = await teamValidate.getPlayersByTeamId(req.user)
 
-    if (!team) {
-      return res.status(200).json({data: []})
-    }
-
-    const players = await UserModel.find({team})
-
-    res.status(200).json({data: players})
-  } catch (err) {
-    errorHandler(next)
-  }
+    res.status(200).json(data)
+  })
 }
 
-const addManagerToTeam = async (req, res, next) => {
-  try {
-    const isValid = validate(schemas.titleSchema)(req.body)
+const addManagerToTeam = (req, res, next) => {
+  console.log('addManagerToTeam')
+  wrap(req, res, next, async () => {
+    const data = await teamValidate.addManager(req)
 
-    if (Array.isArray(isValid)) {
-      return errorHandler(next, {code: 400})
-    }
-
-    if (!req.user) {
-      return errorHandler(next, {code: 404})
-    }
-
-    const {user, body} = req
-    const {title} = body
-
-    if (user.role !== 'manager') {
-      // return res.status(400).json({error: 'This type of user cannot be added to team like manager'})
-      return errorHandler(next, {code: 400})
-    }
-
-    const team = await TeamModel.findOne({title})
-
-    if (!team) {
-      // return res.status(404).json({error: 'Team does not exist'})
-      return errorHandler(next, {code: 404})
-    }
-
-    if (team.managerId) {
-      // return res.status(409).json({error: 'Team already have manager'})
-      return errorHandler(next, {code: 409})
-    }
-
-    await TeamModel.updateOne({_id: team._id}, {managerId: user})
-
-    res.status(200).json({data: team, message: 'Manager was added to the team'})
-  } catch (err) {
-    errorHandler(next)
-  }
+    res.status(200).json(data)
+  })
 }
 
 const requestToTeam = async (req, res, next) => {
@@ -255,9 +201,9 @@ module.exports = {
   createTeam,
   getAllTeams,
   getTeamById,
+  getPlayersByTeam,
   addManagerToTeam,
   requestToTeam,
   approveUserToTeam,
-  deleteTeamById,
-  getPlayersByTeam
+  deleteTeamById
 }

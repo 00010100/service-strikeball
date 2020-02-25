@@ -1,88 +1,48 @@
 const {UserModel} = require('../models')
-const {
-  hashPassword,
-  validatePassword,
-  createToken,
-  verifyToken,
-  errorHandler,
-  validate
-} = require('../utils')
-const authValidate = require('../validator/auth')
+const {verifyToken, errorHandler} = require('../utils')
+const {authValidate, userValidate} = require('../validator')
 
-const schemas = require('../schemas')
-const sgMail = require('../sendgrid')
 const {wrap} = require('../middlewares')
 
-const signUp = async (req, res, next) => {
-  await wrap(req, next, async () => {
-    await authValidate.signUp(req.body)
+const signUp = (req, res, next) => {
+  wrap(req, res, next, async () => {
+    const data = await authValidate.signUp(req.body)
+
+    res.status(201).json(data)
   })
 }
 
-const login = async (req, res, next) => {
-  console.log('HERE????', wrap)
-  const a = await wrap(req, next, async () => {
+const login = (req, res, next) => {
+  wrap(req, res, next, async () => {
     const data = await authValidate.login(req.body)
 
-    console.log('data', data)
-    return res.status(200).json(data)
+    res.status(200).json(data)
   })
-  console.log('HERE????')
-  console.log('21312312312', a)
-  return a
 }
 
-const getAllUsers = async (req, res, next) => {
-  try {
-    const users = await UserModel.find()
+const getAllUsers = (req, res, next) => {
+  wrap(req, res, next, async () => {
+    // TODO - change
+    const data = await UserModel.find()
 
-    res.status(200).json({data: users})
-  } catch (err) {
-    errorHandler(next)
-  }
+    res.status(200).json(data)
+  })
 }
 
-const getUserById = async (req, res, next) => {
-  try {
-    const isValid = validate(schemas.mongoIdSchema)(req.params)
+const getUserById = (req, res, next) => {
+  wrap(req, res, next, async () => {
+    const data = await userValidate.getById(req.params)
 
-    if (Array.isArray(isValid)) {
-      return errorHandler(next, {code: 400})
-    }
-
-    const user = await UserModel.findById(req.params.id)
-
-    if (!user) {
-      // return res.status(404).json({error: 'User does not exist'})
-      return errorHandler(next, {code: 404})
-    }
-
-    res.status(200).json({data: user})
-  } catch (err) {
-    errorHandler(next)
-  }
+    res.status(200).json(data)
+  })
 }
 
-const deleteUserById = async (req, res, next) => {
-  try {
-    const isValid = validate(schemas.mongoIdSchema)(req.params)
+const deleteUserById = (req, res, next) => {
+  wrap(req, res, next, async () => {
+    const data = await userValidate.deleteById(req.params)
 
-    if (Array.isArray(isValid)) {
-      return errorHandler(next, {code: 400})
-    }
-
-    const user = await UserModel.findById(req.params.id)
-
-    if (!user) {
-      return errorHandler(next, {code: 404})
-    }
-
-    await UserModel.deleteOne({_id: req.params.id})
-
-    res.status(200).json({data: user, message: 'User has been deleted'})
-  } catch (err) {
-    errorHandler(next)
-  }
+    res.status(200).json(data)
+  })
 }
 
 const confirmationUserEmail = async (req, res, next) => {
