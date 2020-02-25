@@ -4,46 +4,34 @@ const {authValidate, userValidate} = require('../validator')
 
 const {wrap} = require('../middlewares')
 
-const signUp = (req, res, next) => {
-  wrap(req, res, next, async () => {
-    const data = await authValidate.signUp(req.body)
+const signUp = wrap(async (req, res) => {
+  const data = await authValidate.signUp(req.body)
 
-    res.status(201).json(data)
-  })
-}
+  res.send(data)
+})
 
-const login = (req, res, next) => {
-  wrap(req, res, next, async () => {
-    const data = await authValidate.login(req.body)
+const login = wrap(async (req, res) => {
+  const data = await authValidate.login(req.body)
 
-    res.status(200).json(data)
-  })
-}
+  res.send(data)
+})
 
-const getAllUsers = (req, res, next) => {
-  wrap(req, res, next, async () => {
-    // TODO - change
-    const data = await UserModel.find()
+const getAllUsers = wrap(async (req, res) => {
+  // TODO - change
+  res.send(await UserModel.find())
+})
 
-    res.status(200).json(data)
-  })
-}
+const getUserById = wrap(async (req, res) => {
+  const data = await userValidate.getById(req.params)
 
-const getUserById = (req, res, next) => {
-  wrap(req, res, next, async () => {
-    const data = await userValidate.getById(req.params)
+  res.send(data)
+})
 
-    res.status(200).json(data)
-  })
-}
+const deleteUserById = wrap(async (req, res) => {
+  const data = await userValidate.deleteById(req.params)
 
-const deleteUserById = (req, res, next) => {
-  wrap(req, res, next, async () => {
-    const data = await userValidate.deleteById(req.params)
-
-    res.status(200).json(data)
-  })
-}
+  res.send(data)
+})
 
 const confirmationUserEmail = async (req, res, next) => {
   try {

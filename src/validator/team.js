@@ -3,7 +3,6 @@ const {validate, convertError} = require('../utils')
 const schemas = require('../schemas')
 
 const create = async (data) => {
-  console.log('CREATE')
   const errorList = validate(schemas.titleSchema)(data)
 
   if (Array.isArray(errorList)) {
@@ -26,7 +25,6 @@ const create = async (data) => {
 }
 
 const getById = async (data) => {
-  console.log('GET BY ID')
   const errorList = validate(schemas.mongoIdSchema)(data)
 
   if (Array.isArray(errorList)) {
@@ -43,16 +41,13 @@ const getById = async (data) => {
 }
 
 const getPlayersByTeamId = async (data) => {
-  console.log('GET PLAYERS BY TEAM ID')
   const {team} = data
 
   if (!team) {
     throw {param: 'team id', message: 'Team does not exist'}
   }
-  console.log('here1')
-  const players = await UserModel.find({team})
-  console.log('here2')
-  return players
+
+  return await UserModel.find({team})
 }
 
 const addManager = async ({body, user}) => {
@@ -92,16 +87,26 @@ const addManager = async ({body, user}) => {
   return updatedTeam
 }
 
-// const deleteById = async (data) => {
-//   // const user = await getById(data)
-//   // await UserModel.deleteOne({_id: user._id})
-//   // return user
-// }
+const deleteById = async (data) => {
+  const errorList = validate(schemas.mongoIdSchema)(data)
+
+  if (Array.isArray(errorList)) {
+    throw convertError(errorList)
+  }
+
+  const team = await TeamModel.findById(data.id)
+
+  if (!team) {
+    throw {param: 'id', message: 'Team does not exist'}
+  }
+
+  return team
+}
 
 module.exports = {
   create,
   getById,
   getPlayersByTeamId,
   addManager,
-  // deleteById
+  deleteById
 }

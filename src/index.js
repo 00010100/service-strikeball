@@ -31,11 +31,15 @@ if (process.env.NODE_ENV === 'development') {
 app.use(express.static(path.join(__dirname, '..', '/apidoc')))
 
 app.use('/api/v1', routes)
-// app.use((req, res, next) => notFoundRoutePath(req, res, next))
-// app.use(closingErrorHandler)
+app.use((req, res, next) => notFoundRoutePath(req, res, next))
+app.use(closingErrorHandler)
 
 const port = process.env.PORT || 5000
 
-httpServer.listen(port, () => {
-  logger.info(`Server started at http://localhost:${port}`)
-})
+try {
+  httpServer.listen(port, () => {
+    logger.info(`Server started at http://localhost:${port}`)
+  })
+} catch (err) {
+  console.log(err)
+}

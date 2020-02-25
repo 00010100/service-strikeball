@@ -1,6 +1,7 @@
 const {roles} = require('../roles')
 const {verifyToken, errorHandler} = require('../utils')
 const {UserModel} = require('../models')
+const wrap = require('./wrap')
 
 /**
  *  Check user permission
@@ -8,23 +9,19 @@ const {UserModel} = require('../models')
  * @param action
  * @param resource
  */
-const grantAccess = (action, resource) => {
-  return async (req, res, next) => {
-    try {
-      const permission = roles.can(req.user.role)[action](resource)
+const grantAccess = (action, resource) =>
+  wrap(async (req, res, next) => {
+    const permission = roles.can(req.user.role)[action](resource)
 
-      if (!permission.granted) {
-        // return res
-        //   .status(403)
-        //   .json({error: "You don't have enough permission to perform this action"})
-        return errorHandler(next, {code: 403})
+    if (!permission.granted) {
+      throw {
+        param: 'permission',
+        message: "You don't have enough permission to perform this action"
       }
-      next()
-    } catch (error) {
-      errorHandler(next)
     }
-  }
-}
+
+    next()
+  })
 
 /**
  *  Check user access token
@@ -33,32 +30,25 @@ const grantAccess = (action, resource) => {
  * @param res
  * @param next
  */
-const isUserAuthorized = async (req, res, next) => {
+
+const isUserAuthorized = wrap(async (req, res, next) => {
   if (!req.headers['x-access-token']) return next()
 
-  try {
-    const accessToken = req.headers['x-access-token']
-    const verified = verifyToken(accessToken)
+  const accessToken = req.headers['x-access-token']
+  const verified = verifyToken(accessToken)
 
-    if (!verified) {
-      return errorHandler(next, {code: 404})
-    }
-
-    if (verified.exp < Date.now().valueOf() / 1000) {
-      // return res
-      //   .status(401)
-      //   .json({error: 'JWT token has expired, please login to obtain a new one'})
-      return errorHandler(next, {code: 401})
-    }
-
-    req.user = await UserModel.findById(verified.userId)
-
-    next()
-  } catch (err) {
-    console.log(JSON.stringify(err))
-    errorHandler(next)
+  if (!verified) {
+    throw {param: 'accessToken', message: 'Wrong access token'}
   }
-}
+
+  if (verified.exp < Date.now().valueOf() / 1000) {
+    throw {param: 'accessToken', message: 'JWT token has expired, please login to obtain a new one'}
+  }
+
+  req.user = await UserModel.findById(verified.userId)
+
+  next()
+})
 
 module.exports = {
   grantAccess,
