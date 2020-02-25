@@ -82,6 +82,6 @@ router.post('/signUp', userController.signUp)
  */
 router.post('/login', userController.login)
 
-router.get('/confirmation/:token', userController.confirmationUserEmail)
+// router.get('/confirmation/:token', userController.confirmationUserEmail)
 
 module.exports = router

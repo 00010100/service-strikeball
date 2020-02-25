@@ -1,5 +1,5 @@
 const {roles} = require('../roles')
-const {verifyToken, errorHandler} = require('../utils')
+const {verifyToken} = require('../utils')
 const {UserModel} = require('../models')
 const wrap = require('./wrap')
 

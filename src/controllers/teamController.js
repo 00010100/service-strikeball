@@ -1,7 +1,4 @@
-const {TeamModel, UserModel} = require('../models')
-const sgMail = require('../sendgrid')
-const schemas = require('../schemas')
-const {verifyToken, errorHandler, validate} = require('../utils')
+const {TeamModel} = require('../models')
 const {wrap} = require('../middlewares')
 const {teamValidate} = require('../validator')
 

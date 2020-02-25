@@ -1,6 +1,5 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const errorHandler = require('./errorHandler')
 
 const hashPassword = async (password) => bcrypt.hash(password, 10)
 
