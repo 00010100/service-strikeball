@@ -120,7 +120,7 @@ router.post('/', teamController.createTeam)
       "body": {}
  * }
  */
-router.post('/requestToTeam', teamController.requestToTeam)
+// router.post('/requestToTeam', teamController.requestToTeam)
 
 // router.get('/approveUserToTeam', teamController.approveUserToTeam)
 

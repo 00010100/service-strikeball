@@ -5,197 +5,166 @@ const {verifyToken, errorHandler, validate} = require('../utils')
 const {wrap} = require('../middlewares')
 const {teamValidate} = require('../validator')
 
-const createTeam = (req, res, next) => {
-  console.log('createTeam')
-  wrap(req, res, next, async () => {
-    const data = await teamValidate.create(req.body)
+const createTeam = wrap(async (req, res) => {
+  const data = await teamValidate.create(req.body)
 
-    res.status(200).json(data)
-  })
-}
+  res.send(data)
+})
 
-const getAllTeams = (req, res, next) => {
-  console.log('getAllTeams')
-  wrap(req, res, next, async () => {
-    // TODO - change
-    const data = await TeamModel.find()
+const getAllTeams = wrap(async (req, res) => {
+  // TODO - change
+  res.send(await TeamModel.find())
+})
 
-    res.status(200).json(data)
-  })
-}
+const getTeamById = wrap(async (req, res) => {
+  const data = await teamValidate.getById(req.params)
 
-const getTeamById = (req, res, next) => {
-  console.log('getTeamById')
-  wrap(req, res, next, async () => {
-    const data = await teamValidate.getById(req.params)
+  res.send(data)
+})
 
-    res.status(200).json(data)
-  })
-}
+const getPlayersByTeam = wrap(async (req, res) => {
+  const data = await teamValidate.getPlayersByTeamId(req.user)
 
-const getPlayersByTeam = (req, res, next) => {
-  console.log('getPlayersByTeam')
-  wrap(req, res, next, async () => {
-    const data = await teamValidate.getPlayersByTeamId(req.user)
+  res.send(data)
+})
 
-    res.status(200).json(data)
-  })
-}
+const addManagerToTeam = wrap(async (req, res) => {
+  const data = await teamValidate.addManager(req)
 
-const addManagerToTeam = (req, res, next) => {
-  console.log('addManagerToTeam')
-  wrap(req, res, next, async () => {
-    const data = await teamValidate.addManager(req)
+  res.send(data)
+})
 
-    res.status(200).json(data)
-  })
-}
+const deleteTeamById = wrap(async (req, res) => {
+  const data = await teamValidate.deleteById(req.params)
 
-const requestToTeam = async (req, res, next) => {
-  try {
-    const isValid = validate(schemas.titleSchema)(req.body)
+  res.send(data)
+})
 
-    if (Array.isArray(isValid)) {
-      return errorHandler(next, {code: 400})
-    }
+// const requestToTeam = async (req, res, next) => {
+//   try {
+//     const isValid = validate(schemas.titleSchema)(req.body)
 
-    if (!req.user) {
-      return errorHandler(next, {code: 404})
-    }
+//     if (Array.isArray(isValid)) {
+//       return errorHandler(next, {code: 400})
+//     }
 
-    const {user, body} = req
-    const {_id, email, role, accessToken} = user
-    const {title} = body
+//     if (!req.user) {
+//       return errorHandler(next, {code: 404})
+//     }
 
-    if (role !== 'player') {
-      // return res.status(400).json({error: 'This type of user cannot be added to the team'})
-      return errorHandler(next, {code: 400})
-    }
+//     const {user, body} = req
+//     const {_id, email, role, accessToken} = user
+//     const {title} = body
 
-    const team = await TeamModel.findOne({title})
+//     if (role !== 'player') {
+//       // return res.status(400).json({error: 'This type of user cannot be added to the team'})
+//       return errorHandler(next, {code: 400})
+//     }
 
-    if (!team) {
-      return errorHandler(next, {code: 404})
-      // return res.status(404).json({error: 'Team does not exist'})
-    }
+//     const team = await TeamModel.findOne({title})
 
-    if (team.playersId.includes(_id)) {
-      // return res.status(409).json({error: 'User already in the team'})
-      return errorHandler(next, {code: 409})
-    }
+//     if (!team) {
+//       return errorHandler(next, {code: 404})
+//       // return res.status(404).json({error: 'Team does not exist'})
+//     }
 
-    if (team.playersCount === 10) {
-      // return res.status(400).json({error: 'Team has been already full'})
-      return errorHandler(next, {code: 409})
-    }
+//     if (team.playersId.includes(_id)) {
+//       // return res.status(409).json({error: 'User already in the team'})
+//       return errorHandler(next, {code: 409})
+//     }
 
-    const manager = await UserModel.findById(team.managerId)
+//     if (team.playersCount === 10) {
+//       // return res.status(400).json({error: 'Team has been already full'})
+//       return errorHandler(next, {code: 409})
+//     }
 
-    if (!manager) {
-      // return res.status(400).json({error: 'Team does not have manager. Try again later'})
-      return errorHandler(next, {code: 404})
-    }
+//     const manager = await UserModel.findById(team.managerId)
 
-    const link = `${process.env.SERVER}/team/approveUserToTeam?token=${accessToken}&title=${team.title}&role=${role}`
+//     if (!manager) {
+//       // return res.status(400).json({error: 'Team does not have manager. Try again later'})
+//       return errorHandler(next, {code: 404})
+//     }
 
-    sgMail.send({
-      to: manager.email,
-      from: email,
-      subject: `Adding to the team ${team.title} approvement`,
-      text: `Click link to add this user ${email} to the team ${team.title}: <a target="_blank" href="${link}">${link}</a>`,
-      html: `<strong>Click link to approvement this user ${email}: <a target="_blank" href="${link}">${link}</a></strong>`
-    })
+//     const link = `${process.env.SERVER}/team/approveUserToTeam?token=${accessToken}&title=${team.title}&role=${role}`
 
-    res.status(200).json({data: null, message: 'Your request was sended'})
-  } catch (err) {
-    errorHandler(next)
-  }
-}
+//     sgMail.send({
+//       to: manager.email,
+//       from: email,
+//       subject: `Adding to the team ${team.title} approvement`,
+//       text: `Click link to add this user ${email} to the team ${team.title}: <a target="_blank" href="${link}">${link}</a>`,
+//       html: `<strong>Click link to approvement this user ${email}: <a target="_blank" href="${link}">${link}</a></strong>`
+//     })
 
-const approveUserToTeam = async (req, res, next) => {
-  try {
-    const isValid = validate(schemas.approveSchema)(req.query)
+//     res.status(200).json({data: null, message: 'Your request was sended'})
+//   } catch (err) {
+//     errorHandler(next)
+//   }
+// }
 
-    if (Array.isArray(isValid)) {
-      return errorHandler(next, {code: 400})
-    }
+// const approveUserToTeam = async (req, res, next) => {
+//   try {
+//     const isValid = validate(schemas.approveSchema)(req.query)
 
-    const {token, title, role} = req.query
-    const {email: managerEmail} = req.user
-    const verified = verifyToken(token)
+//     if (Array.isArray(isValid)) {
+//       return errorHandler(next, {code: 400})
+//     }
 
-    if (!verified) {
-      return errorHandler(next, {code: 404})
-    }
+//     const {token, title, role} = req.query
+//     const {email: managerEmail} = req.user
+//     const verified = verifyToken(token)
 
-    const user = await UserModel.findById(verified.userId)
+//     if (!verified) {
+//       return errorHandler(next, {code: 404})
+//     }
 
-    if (!user) {
-      // return res.status(404).json({error: 'User does not exist'})
-      return errorHandler(next, {code: 404})
-    }
+//     const user = await UserModel.findById(verified.userId)
 
-    if (role !== 'player') {
-      // return res.status(400).json({error: 'This type of user cannot be added to the team'})
-      return errorHandler(next, {code: 400})
-    }
+//     if (!user) {
+//       // return res.status(404).json({error: 'User does not exist'})
+//       return errorHandler(next, {code: 404})
+//     }
 
-    const team = await TeamModel.findOne({title})
+//     if (role !== 'player') {
+//       // return res.status(400).json({error: 'This type of user cannot be added to the team'})
+//       return errorHandler(next, {code: 400})
+//     }
 
-    if (!team) {
-      // return res.status(404).json({error: 'Team does not exist'})
-      return errorHandler(next, {code: 404})
-    }
+//     const team = await TeamModel.findOne({title})
 
-    if (team.playersId.includes(user._id)) {
-      // return res.status(409).json({error: 'User already in the team'})
-      return errorHandler(next, {code: 409})
-    }
+//     if (!team) {
+//       // return res.status(404).json({error: 'Team does not exist'})
+//       return errorHandler(next, {code: 404})
+//     }
 
-    if (team.playersCount === 10) {
-      // return res.status(409).json({error: 'Team has been already full'})
-      return errorHandler(next, {code: 409})
-    }
+//     if (team.playersId.includes(user._id)) {
+//       // return res.status(409).json({error: 'User already in the team'})
+//       return errorHandler(next, {code: 409})
+//     }
 
-    team.playersId.push(user._id)
-    team.playersCount++
+//     if (team.playersCount === 10) {
+//       // return res.status(409).json({error: 'Team has been already full'})
+//       return errorHandler(next, {code: 409})
+//     }
 
-    await team.save()
-    await UserModel.findByIdAndUpdate(user._id, {team: team._id})
+//     team.playersId.push(user._id)
+//     team.playersCount++
 
-    sgMail.send({
-      to: user.email,
-      from: managerEmail,
-      subject: `Congradulations you added to the team ${team.title}`,
-      text: `Congradulations you added to the team ${team.title}`,
-      html: `<strong>Congradulations you added to the team ${team.title}</strong>`
-    })
+//     await team.save()
+//     await UserModel.findByIdAndUpdate(user._id, {team: team._id})
 
-    return res.status(200).json({data: {team, user}, message: 'User successfully approved'})
-  } catch (err) {
-    errorHandler(next)
-  }
-}
+//     sgMail.send({
+//       to: user.email,
+//       from: managerEmail,
+//       subject: `Congradulations you added to the team ${team.title}`,
+//       text: `Congradulations you added to the team ${team.title}`,
+//       html: `<strong>Congradulations you added to the team ${team.title}</strong>`
+//     })
 
-const deleteTeamById = async (req, res, next) => {
-  try {
-    const isValid = validate(schemas.mongoIdSchema)(req.params)
-
-    if (Array.isArray(isValid)) {
-      return errorHandler(next, {code: 400})
-    }
-
-    const team = await TeamModel.findByIdAndDelete(req.params.id)
-
-    if (!team) {
-      return errorHandler(next, {code: 404})
-    }
-
-    return res.status(200).json({data: team, message: 'Team has been deleted'})
-  } catch (err) {
-    errorHandler(next)
-  }
-}
+//     return res.status(200).json({data: {team, user}, message: 'User successfully approved'})
+//   } catch (err) {
+//     errorHandler(next)
+//   }
+// }
 
 module.exports = {
   createTeam,
@@ -203,7 +172,7 @@ module.exports = {
   getTeamById,
   getPlayersByTeam,
   addManagerToTeam,
-  requestToTeam,
-  approveUserToTeam,
   deleteTeamById
+  // requestToTeam,
+  // approveUserToTeam,
 }

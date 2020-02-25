@@ -1,11 +1,13 @@
+const {logger} = require('../utils')
+
 const singleError = (error) => {
   if (error instanceof Error) {
-    console.log(JSON.stringify(error))
+    logger.error(error)
     return {message: 'Internal server error oqued'}
   }
 
   if (!(error.message && error.param)) {
-    console.log(JSON.stringify(error))
+    logger.error(error)
     return {message: 'Unknown server error oqued'}
   }
 
@@ -26,17 +28,18 @@ const errorBuilder = (errors) => {
   return [singleError(errors)]
 }
 
-const wrap = async (req, res, next, middleware) => {
+const wrap = (middleware, name) => async (req, res, next) => {
   try {
-    req.body = await middleware()
-    // this.headerSet(req);
+    return await middleware(req, res, next)
   } catch (err) {
-    console.log(err)
-    // this.headerSet(req);
-    res.status(400).json(errorBuilder(err))
-  }
+    if (name || middleware.name) {
+      logger.error('In %s', name || middleware.name)
+    }
 
-  next && (await next())
+    logger.error('%s', err.stack)
+
+    return next(errorBuilder(err))
+  }
 }
 
 module.exports = wrap
