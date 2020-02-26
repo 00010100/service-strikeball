@@ -1,9 +1,9 @@
 const {TeamModel, UserModel} = require('../models')
 const {validate, convertError} = require('../utils')
-const schemas = require('../schemas')
+const schema = require('./validateSchema')
 
 const create = async (data) => {
-  const errorList = validate(schemas.titleSchema)(data)
+  const errorList = validate(schema.title)(data)
 
   if (Array.isArray(errorList)) {
     throw convertError(errorList)
@@ -25,7 +25,7 @@ const create = async (data) => {
 }
 
 const getById = async (data) => {
-  const errorList = validate(schemas.mongoIdSchema)(data)
+  const errorList = validate(schema.id)(data)
 
   if (Array.isArray(errorList)) {
     throw convertError(errorList)
@@ -51,7 +51,7 @@ const getPlayersByTeamId = async (data) => {
 }
 
 const addManager = async ({body, user}) => {
-  const errorList = validate(schemas.titleSchema)(body)
+  const errorList = validate(schema.title)(body)
 
   if (Array.isArray(errorList)) {
     throw convertError(errorList)
@@ -88,7 +88,7 @@ const addManager = async ({body, user}) => {
 }
 
 const deleteById = async (data) => {
-  const errorList = validate(schemas.mongoIdSchema)(data)
+  const errorList = validate(schema.id)(data)
 
   if (Array.isArray(errorList)) {
     throw convertError(errorList)

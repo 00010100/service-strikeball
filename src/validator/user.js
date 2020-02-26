@@ -1,10 +1,9 @@
 const {UserModel} = require('../models')
 const {validate, convertError} = require('../utils')
-const schemas = require('../schemas')
+const schema = require('./validateSchema')
 
 const getById = async (data) => {
-  console.log('GET BY ID USER')
-  const errorList = validate(schemas.mongoIdSchema)(data)
+  const errorList = validate(schema.id)(data)
 
   if (Array.isArray(errorList)) {
     throw convertError(errorList)
@@ -20,7 +19,6 @@ const getById = async (data) => {
 }
 
 const deleteById = async (data) => {
-  console.log('DELETE BY ID USER')
   const user = await getById(data)
 
   await UserModel.deleteOne({_id: user._id})

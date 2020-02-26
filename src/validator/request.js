@@ -1,6 +1,6 @@
 const {TeamModel, UserModel, RequestModel} = require('../models')
 const {validate, convertError} = require('../utils')
-const schemas = require('../schemas')
+const schema = require('./validateSchema')
 
 const create = async ({body, user}) => {
   if (!user) {
@@ -11,7 +11,7 @@ const create = async ({body, user}) => {
     throw {param: 'role', message: 'This type of user cannot create request'}
   }
 
-  const errorList = validate(schemas.requestCreateSchema)(body)
+  const errorList = validate(schema.requestCreate)(body)
 
   if (Array.isArray(errorList)) {
     throw convertError(errorList)
@@ -59,7 +59,7 @@ const create = async ({body, user}) => {
 }
 
 const getById = async (data) => {
-  const errorList = validate(schemas.mongoIdSchema)(data)
+  const errorList = validate(schema.id)(data)
 
   if (Array.isArray(errorList)) {
     throw convertError(errorList)
@@ -75,7 +75,7 @@ const getById = async (data) => {
 }
 
 const cancel = async ({params, user}) => {
-  const errorList = validate(schemas.mongoIdSchema)(params)
+  const errorList = validate(schema.id)(params)
 
   if (Array.isArray(errorList)) {
     throw convertError(errorList)
@@ -99,7 +99,7 @@ const cancel = async ({params, user}) => {
 }
 
 const update = async ({status, id}) => {
-  const errorList = validate(schemas.requestUpdateSchema)({status, id})
+  const errorList = validate(schema.requestUpdate)({status, id})
 
   if (Array.isArray(errorList)) {
     throw convertError(errorList)

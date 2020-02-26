@@ -31,14 +31,18 @@ const errorBuilder = (errors) => {
 const wrap = (middleware, name) => async (req, res, next) => {
   try {
     return await middleware(req, res, next)
-  } catch (err) {
+  } catch (error) {
     if (name || middleware.name) {
       logger.error('In %s', name || middleware.name)
     }
 
-    logger.error('%s', err.stack)
+    logger.error(errorBuilder(error))
 
-    return next(errorBuilder(err))
+    if (error.stack) {
+      logger.error('%s', error.stack)
+    }
+
+    return next(errorBuilder(error))
   }
 }
 

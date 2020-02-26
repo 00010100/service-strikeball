@@ -1,12 +1,12 @@
 const {UserModel} = require('../models')
 const {validatePassword, validate, convertError, createToken, hashPassword} = require('../utils')
-const schemas = require('../schemas')
+const schema = require('./validateSchema')
 const sgMail = require('../sendgrid')
 
 const login = async (data) => {
   const {email, password} = data
+  const errorList = validate(schema.login)(data)
 
-  const errorList = validate(schemas.loginSchema)(data)
   if (Array.isArray(errorList)) {
     throw convertError(errorList)
   }
@@ -39,7 +39,7 @@ const login = async (data) => {
 const signUp = async (data) => {
   const {email, name, role, password, team} = data
 
-  const errorList = validate(schemas.signUpSchema)(data)
+  const errorList = validate(schema.signUp)(data)
 
   if (Array.isArray(errorList)) {
     throw convertError(errorList)
