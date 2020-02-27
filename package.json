@@ -8,7 +8,8 @@
     "dev": "nodemon ./src/index.js",
     "doc": "apidoc -i './src/routes' -o apidoc/",
     "docServer": "open http://localhost:5000/api/v1/apidoc",
-    "lint": "eslint"
+    "lint": "eslint",
+    "inspect": "nodemon --inspect ./src/index.js"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +25,7 @@
     "helmet": "^3.21.2",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.8.11",
+    "ramda": "^0.27.0",
     "winston": "^3.2.1"
   },
   "devDependencies": {

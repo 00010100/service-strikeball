@@ -1,24 +1,26 @@
 const {UserModel} = require('../models')
 const {verifyToken, errorHandler} = require('../utils')
 const {authValidate, userValidate} = require('../validator')
+const {authAction, userAction} = require('../actions')
 
 const {wrap} = require('../middlewares')
 
 const signUp = wrap(async (req, res) => {
   const data = await authValidate.signUp(req.body)
+  const result = await authAction.signUp(data)
 
-  res.send(data)
+  res.send(result)
 })
 
 const login = wrap(async (req, res) => {
   const data = await authValidate.login(req.body)
+  const result = await authAction.login(data)
 
-  res.send(data)
+  res.send(result)
 })
 
 const getAllUsers = wrap(async (req, res) => {
-  // TODO - change
-  res.send(await UserModel.find())
+  res.send(await userAction.getAll())
 })
 
 const getUserById = wrap(async (req, res) => {
