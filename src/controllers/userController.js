@@ -1,150 +1,37 @@
 const {UserModel} = require('../models')
-const {
-  hashPassword,
-  validatePassword,
-  createToken,
-  verifyToken,
-  errorHandler,
-  validate
-} = require('../utils')
+const {verifyToken, errorHandler} = require('../utils')
+const {authValidate, userValidate} = require('../validator')
 
-const schemas = require('../schemas')
-const sgMail = require('../sendgrid')
+const {wrap} = require('../middlewares')
 
-const signUp = async (req, res, next) => {
-  try {
-    const {email, name, role, password, team} = req.body
+const signUp = wrap(async (req, res) => {
+  const data = await authValidate.signUp(req.body)
 
-    const isValid = validate(schemas.signUpSchema)(req.body)
+  res.send(data)
+})
 
-    if (Array.isArray(isValid)) {
-      return errorHandler(next, {code: 400})
-    }
+const login = wrap(async (req, res) => {
+  const data = await authValidate.login(req.body)
 
-    const user = await UserModel.findOne({email})
+  res.send(data)
+})
 
-    if (user) {
-      return errorHandler(next, {code: 409})
-    }
+const getAllUsers = wrap(async (req, res) => {
+  // TODO - change
+  res.send(await UserModel.find())
+})
 
-    const hashedPassword = await hashPassword(password)
+const getUserById = wrap(async (req, res) => {
+  const data = await userValidate.getById(req.params)
 
-    const newUser = new UserModel({email, name, password: hashedPassword, role, team})
+  res.send(data)
+})
 
-    const accessToken = createToken(newUser._id)
+const deleteUserById = wrap(async (req, res) => {
+  const data = await userValidate.deleteById(req.params)
 
-    newUser.accessToken = accessToken
-
-    await newUser.save()
-
-    if (role === 'manager') {
-      const link = `${process.env.SERVER}/auth/confirmation/${accessToken}`
-      sgMail.send({
-        to: 'e0001101004+admin@gmail.com',
-        from: email,
-        subject: 'Registration approvement',
-        text: `Click link to approvement this user ${email}: <a target="_blank" href="${link}">${link}</a>`,
-        html: `<strong>Click link to approvement this user ${email}: <a target="_blank" href="${link}">${link}</a></strong>`
-      })
-    }
-
-    res.status(201).json({data: newUser, accessToken})
-  } catch (err) {
-    errorHandler(next)
-  }
-}
-
-const login = async (req, res, next) => {
-  try {
-    const {email, password} = req.body
-
-    const isValid = validate(schemas.loginSchema)(req.body)
-
-    if (Array.isArray(isValid)) {
-      return errorHandler(next, {code: 400})
-    }
-
-    const user = await UserModel.findOne({email})
-
-    if (!user) {
-      // return res.status(404).json({error: 'Email does not exist'})
-      return errorHandler(next, {code: 404})
-    }
-
-    const validPassword = await validatePassword(password, user.password)
-
-    if (!validPassword) {
-      // return res.status(404).json({error: 'Password is not correct'})
-      return errorHandler(next, {code: 404})
-    }
-
-    if (user.role === 'manager' && !user.confirmed) {
-      // return res.status(400).json({error: 'You need to be confirmed to access this route'})
-      return errorHandler(next, {code: 403})
-    }
-
-    const accessToken = createToken(user._id)
-
-    await UserModel.updateOne({_id: user._id}, {accessToken})
-
-    res.status(200).json({data: {email: user.email, role: user.role}, accessToken})
-  } catch (err) {
-    errorHandler(next)
-  }
-}
-
-const getAllUsers = async (req, res, next) => {
-  try {
-    const users = await UserModel.find()
-
-    res.status(200).json({data: users})
-  } catch (err) {
-    errorHandler(next)
-  }
-}
-
-const getUserById = async (req, res, next) => {
-  try {
-    const isValid = validate(schemas.mongoIdSchema)(req.params)
-
-    if (Array.isArray(isValid)) {
-      return errorHandler(next, {code: 400})
-    }
-
-    const user = await UserModel.findById(req.params.id)
-
-    if (!user) {
-      // return res.status(404).json({error: 'User does not exist'})
-      return errorHandler(next, {code: 404})
-    }
-
-    res.status(200).json({data: user})
-  } catch (err) {
-    errorHandler(next)
-  }
-}
-
-const deleteUserById = async (req, res, next) => {
-  try {
-    const isValid = validate(schemas.mongoIdSchema)(req.params)
-
-    if (Array.isArray(isValid)) {
-      return errorHandler(next, {code: 400})
-    }
-
-    const user = await UserModel.findById(req.params.id)
-
-    if (!user) {
-      return errorHandler(next, {code: 404})
-    }
-
-    await UserModel.deleteOne({_id: req.params.id})
-
-    res.status(200).json({data: user, message: 'User has been deleted'})
-  } catch (err) {
-    errorHandler(next)
-  }
-}
+  res.send(data)
+})
 
 const confirmationUserEmail = async (req, res, next) => {
   try {

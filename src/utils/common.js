@@ -1,6 +1,5 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const errorHandler = require('./errorHandler')
 
 const hashPassword = async (password) => bcrypt.hash(password, 10)
 
@@ -17,9 +16,12 @@ const verifyToken = (accessToken) => {
   }
 }
 
+const convertError = (list) => list.map(({field, message}) => ({param: field, message}))
+
 module.exports = {
   hashPassword,
   validatePassword,
   createToken,
-  verifyToken
+  verifyToken,
+  convertError
 }
