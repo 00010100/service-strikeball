@@ -1,40 +1,45 @@
-const {TeamModel} = require('../models')
 const {wrap} = require('../middlewares')
 const {teamValidate} = require('../validator')
+const {teamAction} = require('../actions')
 
 const createTeam = wrap(async (req, res) => {
   const data = await teamValidate.create(req.body)
+  const result = await teamAction.create(data)
 
-  res.send(data)
+  res.send(result)
 })
 
 const getAllTeams = wrap(async (req, res) => {
-  // TODO - change
-  res.send(await TeamModel.find())
+  const result = await teamAction.getTeams()
+
+  res.send(result)
 })
 
 const getTeamById = wrap(async (req, res) => {
-  const data = await teamValidate.getById(req.params)
+  const result = await teamValidate.getById(req.params)
 
-  res.send(data)
+  res.send(result)
 })
 
 const getPlayersByTeam = wrap(async (req, res) => {
   const data = await teamValidate.getPlayersByTeamId(req.user)
+  const result = await teamAction.getPlayersByTeamId(data)
 
-  res.send(data)
+  res.send(result)
 })
 
 const addManagerToTeam = wrap(async (req, res) => {
   const data = await teamValidate.addManager(req)
+  const result = await teamAction.addManager(data)
 
-  res.send(data)
+  res.send(result)
 })
 
 const deleteTeamById = wrap(async (req, res) => {
   const data = await teamValidate.deleteById(req.params)
+  const result = await teamAction.deleteById(data)
 
-  res.send(data)
+  res.send(result)
 })
 
 // const requestToTeam = async (req, res, next) => {

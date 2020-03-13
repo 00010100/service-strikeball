@@ -9,19 +9,13 @@ const create = async (data) => {
     throw convertError(errorList)
   }
 
-  const {title} = data
-
-  const team = await TeamModel.findOne({title})
+  const team = await TeamModel.findOne({title: data.title})
 
   if (team) {
     throw {param: 'title', message: 'Team already exist'}
   }
 
-  const newTeam = new TeamModel({title})
-
-  await newTeam.save()
-
-  return newTeam
+  return data
 }
 
 const getById = async (data) => {
@@ -47,7 +41,7 @@ const getPlayersByTeamId = async (data) => {
     throw {param: 'team id', message: 'Team does not exist'}
   }
 
-  return await UserModel.find({team})
+  return team
 }
 
 const addManager = async ({body, user}) => {
@@ -79,12 +73,7 @@ const addManager = async ({body, user}) => {
     throw {param: 'managerId', message: 'Team already have manager'}
   }
 
-  await TeamModel.updateOne({_id: team._id}, {managerId: user._id})
-  const updatedTeam = await TeamModel.findById(team._id)
-
-  await UserModel.updateOne({_id: user._id}, {team: updatedTeam._id})
-
-  return updatedTeam
+  return {team, user}
 }
 
 const deleteById = async (data) => {
