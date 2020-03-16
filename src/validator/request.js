@@ -11,7 +11,7 @@ const create = async ({body, user}) => {
     throw {param: 'role', message: 'This type of user cannot create request'}
   }
 
-  const errorList = validate(schema.requestCreate)(body)
+  const errorList = validate(schema.createRequest)(body)
 
   if (Array.isArray(errorList)) {
     throw convertError(errorList)
@@ -37,25 +37,19 @@ const create = async ({body, user}) => {
     throw {param: 'to', message: 'Manager does not exist'}
   }
 
-  const team = await TeamModel.findOne({title: teamName, managerId: manager._id})
+  const team = await TeamModel.findOne({title: teamName})
 
   if (!team) {
     throw {param: 'teamName', message: 'Team does not exist'}
   }
 
-  const swapTeam = await TeamModel.findOne({title: swapTeamName, managerId: manager._id})
+  const swapTeam = await TeamModel.findOne({title: swapTeamName})
 
-  if (!swapTeam) {
+  if (type === 'change' && !swapTeam) {
     throw {param: 'swapTeamName', message: 'Team does not exist'}
   }
 
-  const data = {...body, from: user.email}
-
-  const newRequest = new RequestModel(data)
-
-  await newRequest.save()
-
-  return newRequest
+  return {...body, from: user.email}
 }
 
 const getById = async (data) => {
@@ -93,13 +87,13 @@ const cancel = async ({params, user}) => {
     throw {param: 'from', message: 'Access denied'}
   }
 
-  await RequestModel.deleteOne({_id: id})
-
-  return request
+  return {request, id}
 }
 
-const update = async ({status, id}) => {
-  const errorList = validate(schema.requestUpdate)({status, id})
+const update = async (data) => {
+  const {status, id} = data
+
+  const errorList = validate(schema.updateRequest)({status, id})
 
   if (Array.isArray(errorList)) {
     throw convertError(errorList)
@@ -111,126 +105,262 @@ const update = async ({status, id}) => {
     throw {param: 'status', message: 'Request already approved/declined'}
   }
 
-  await RequestModel.updateOne({_id: id}, {status})
+  return {request, ...data}
+}
 
-  if (status === 'approved') {
-    switch (request.type) {
-      case 'join': {
-        const user = await UserModel.findOne({email: request.from})
+const updateJoin = async (data) => {
+  const {request} = data
 
-        if (!user) {
-          throw {param: 'from', message: 'User does not exist'}
-        }
+  const user = await UserModel.findOne({email: request.from})
 
-        if (user.team) {
-          throw {param: 'team', message: 'User already have a team'}
-        }
-
-        const team = await TeamModel.findOne({title: request.teamName})
-
-        if (!team) {
-          throw {param: 'team', message: 'Team does not exist'}
-        }
-
-        if (team.playersId.includes(user._id)) {
-          throw {param: 'playersId', message: 'User already in team'}
-        }
-
-        if (team.playersCount === 10) {
-          throw {param: 'playersCount', message: 'Team already full'}
-        }
-
-        team.playersId.push(user._id)
-        team.playersCount++
-        await team.save()
-        await UserModel.updateOne({_id: user._id}, {team: team._id})
-
-        break
-      }
-      case 'leave': {
-        const user = await UserModel.findOne({email: request.from})
-
-        if (!user) {
-          throw {param: 'from', message: 'User does not exist'}
-        }
-
-        if (!user.team) {
-          throw {param: 'team', message: 'User does not have a team'}
-        }
-
-        const team = await TeamModel.findOne({_id: user.team})
-
-        if (!team) {
-          throw {param: 'team', message: 'Team does not exist'}
-        }
-
-        if (!team.playersId.includes(user._id)) {
-          throw {param: 'playersId', message: 'User does not have a team'}
-        }
-
-        team.playersCount--
-        team.playersId.pull(user._id)
-        await team.save()
-        await UserModel.updateOne({_id: user._id}, {team: null})
-
-        break
-      }
-      case 'change': {
-        const user = await UserModel.findOne({email: request.from})
-
-        if (!user) {
-          throw {param: 'from', message: 'User does not exist'}
-        }
-
-        if (!user.team) {
-          throw {param: 'team', message: 'User does not have a team'}
-        }
-
-        const team = await TeamModel.findOne({_id: user.team})
-
-        if (!team) {
-          throw {param: 'team', message: 'Team does not exist'}
-        }
-
-        if (!team.playersId.includes(user._id)) {
-          throw {param: 'playersId', message: 'User does not have a team'}
-        }
-
-        const swapTeam = await TeamModel.findOne({title: request.swapTeamName})
-
-        if (!swapTeam) {
-          throw {param: 'swapTeamName', message: 'Team does not exist'}
-        }
-
-        if (!swapTeam.managerId) {
-          throw {param: 'managerId', message: 'Team does not have a manager'}
-        }
-
-        if (swapTeam.playersCount === 10) {
-          throw {params: 'playersCount', message: 'Team already full'}
-        }
-
-        team.playersCount--
-        team.playersId.pull(user._id)
-        await team.save()
-
-        swapTeam.playersCount++
-        swapTeam.playersId.push(user._id)
-        await swapTeam.save()
-
-        await UserModel.updateOne({_id: user._id}, {team: swapTeam._id})
-
-        break
-      }
-    }
+  if (!user) {
+    throw {param: 'from', message: 'User does not exist'}
   }
 
-  return await RequestModel.findById(id)
+  if (user.team) {
+    throw {param: 'team', message: 'User already have a team'}
+  }
+
+  const team = await TeamModel.findOne({title: request.teamName})
+
+  if (!team) {
+    throw {param: 'team', message: 'Team does not exist'}
+  }
+
+  if (team.playersId.includes(user._id)) {
+    throw {param: 'playersId', message: 'User already in team'}
+  }
+
+  if (team.playersCount === 10) {
+    throw {param: 'playersCount', message: 'Team already full'}
+  }
+
+  // team.playersId.push(user._id)
+  // team.playersCount++
+  // await team.save()
+  // await UserModel.updateOne({_id: user._id}, {team: team._id})
+  return {team, user}
 }
+
+const updateLeave = async (data) => {
+  const {request, id} = data
+
+  const user = await UserModel.findOne({email: request.from})
+
+  if (!user) {
+    throw {param: 'from', message: 'User does not exist'}
+  }
+
+  if (!user.team) {
+    throw {param: 'team', message: 'User does not have a team'}
+  }
+
+  const team = await TeamModel.findOne({_id: user.team})
+
+  if (!team) {
+    throw {param: 'team', message: 'Team does not exist'}
+  }
+
+  if (!team.playersId.includes(user._id)) {
+    throw {param: 'playersId', message: 'User does not have a team'}
+  }
+
+  return {team, user}
+
+  // team.playersCount--
+  // team.playersId.pull(user._id)
+  // await team.save()
+  // await UserModel.updateOne({_id: user._id}, {team: null})
+}
+
+const updateChange = async (data) => {
+  console.log('here!"№')
+  const {request, id} = data
+
+  const user = await UserModel.findOne({email: request.from})
+
+  if (!user) {
+    throw {param: 'from', message: 'User does not exist'}
+  }
+
+  if (!user.team) {
+    throw {param: 'team', message: 'User does not have a team'}
+  }
+
+  const team = await TeamModel.findOne({_id: user.team})
+
+  if (!team) {
+    throw {param: 'team', message: 'Team does not exist'}
+  }
+
+  if (!team.playersId.includes(user._id)) {
+    throw {param: 'playersId', message: 'User does not have a team'}
+  }
+
+  const swapTeam = await TeamModel.findOne({title: request.swapTeamName})
+
+  if (!swapTeam) {
+    throw {param: 'swapTeamName', message: 'Team does not exist'}
+  }
+
+  if (!swapTeam.managerId) {
+    throw {param: 'managerId', message: 'Team does not have a manager'}
+  }
+
+  if (swapTeam.playersCount === 10) {
+    throw {params: 'playersCount', message: 'Team already full'}
+  }
+
+  return {team, swapTeam, user}
+
+  // team.playersCount--
+  // team.playersId.pull(user._id)
+  // await team.save()
+
+  // swapTeam.playersCount++
+  // swapTeam.playersId.push(user._id)
+  // await swapTeam.save()
+
+  // await UserModel.updateOne({_id: user._id}, {team: swapTeam._id})
+}
+
+// const update = async ({status, id}) => {
+//   const errorList = validate(schema.requestUpdate)({status, id})
+
+//   if (Array.isArray(errorList)) {
+//     throw convertError(errorList)
+//   }
+
+//   const request = await RequestModel.findById(id)
+
+//   if (!request || request.status !== 'pending') {
+//     throw {param: 'status', message: 'Request already approved/declined'}
+//   }
+
+//   await RequestModel.updateOne({_id: id}, {status})
+
+//   if (status === 'approved') {
+//     switch (request.type) {
+//       case 'join': {
+//         const user = await UserModel.findOne({email: request.from})
+
+//         if (!user) {
+//           throw {param: 'from', message: 'User does not exist'}
+//         }
+
+//         if (user.team) {
+//           throw {param: 'team', message: 'User already have a team'}
+//         }
+
+//         const team = await TeamModel.findOne({title: request.teamName})
+
+//         if (!team) {
+//           throw {param: 'team', message: 'Team does not exist'}
+//         }
+
+//         if (team.playersId.includes(user._id)) {
+//           throw {param: 'playersId', message: 'User already in team'}
+//         }
+
+//         if (team.playersCount === 10) {
+//           throw {param: 'playersCount', message: 'Team already full'}
+//         }
+
+//         team.playersId.push(user._id)
+//         team.playersCount++
+//         await team.save()
+//         await UserModel.updateOne({_id: user._id}, {team: team._id})
+
+//         break
+//       }
+//       case 'leave': {
+//         const user = await UserModel.findOne({email: request.from})
+
+//         if (!user) {
+//           throw {param: 'from', message: 'User does not exist'}
+//         }
+
+//         if (!user.team) {
+//           throw {param: 'team', message: 'User does not have a team'}
+//         }
+
+//         const team = await TeamModel.findOne({_id: user.team})
+
+//         if (!team) {
+//           throw {param: 'team', message: 'Team does not exist'}
+//         }
+
+//         if (!team.playersId.includes(user._id)) {
+//           throw {param: 'playersId', message: 'User does not have a team'}
+//         }
+
+//         team.playersCount--
+//         team.playersId.pull(user._id)
+//         await team.save()
+//         await UserModel.updateOne({_id: user._id}, {team: null})
+
+//         break
+//       }
+//       case 'change': {
+//         const user = await UserModel.findOne({email: request.from})
+
+//         if (!user) {
+//           throw {param: 'from', message: 'User does not exist'}
+//         }
+
+//         if (!user.team) {
+//           throw {param: 'team', message: 'User does not have a team'}
+//         }
+
+//         const team = await TeamModel.findOne({_id: user.team})
+
+//         if (!team) {
+//           throw {param: 'team', message: 'Team does not exist'}
+//         }
+
+//         if (!team.playersId.includes(user._id)) {
+//           throw {param: 'playersId', message: 'User does not have a team'}
+//         }
+
+//         const swapTeam = await TeamModel.findOne({title: request.swapTeamName})
+
+//         if (!swapTeam) {
+//           throw {param: 'swapTeamName', message: 'Team does not exist'}
+//         }
+
+//         if (!swapTeam.managerId) {
+//           throw {param: 'managerId', message: 'Team does not have a manager'}
+//         }
+
+//         if (swapTeam.playersCount === 10) {
+//           throw {params: 'playersCount', message: 'Team already full'}
+//         }
+
+//         team.playersCount--
+//         team.playersId.pull(user._id)
+//         await team.save()
+
+//         swapTeam.playersCount++
+//         swapTeam.playersId.push(user._id)
+//         await swapTeam.save()
+
+//         await UserModel.updateOne({_id: user._id}, {team: swapTeam._id})
+
+//         break
+//       }
+//     }
+//   } else {
+//   }
+
+//   return await RequestModel.findById(id)
+// }
 
 module.exports = {
   create,
   getById,
   cancel,
-  update
+  update,
+  updateJoin,
+  updateLeave,
+  updateChange
 }
